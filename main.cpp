@@ -1,3 +1,7 @@
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_freeglut.h"
+#include "imgui/imgui_impl_opengl2.h"
+
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <list>
@@ -205,14 +209,36 @@ void drawScene() {
     }
 }
 
+void initGui() 
+{
+    ImGui::ShowDemoWindow();
+}
+
 // called by GLUT - displays the scene
-void display() {
+void display() 
+{
+    //imgui new frame
+    ImGui_ImplOpenGL2_NewFrame();
+    ImGui_ImplFreeGLUT_NewFrame();
+
+    initGui();
+
+    ImGui::Render();
+    ImGuiIO& io = ImGui::GetIO();
+
+    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    gluPerspective(40.0, io.DisplaySize.x / io.DisplaySize.y, 1.0, 150.0);
     glLoadIdentity();
 
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
 
     drawScene();
+
+    glDisable(GL_LIGHTING);
+    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    glEnable(GL_LIGHTING);
 
     glutSwapBuffers();
 }
@@ -294,8 +320,16 @@ int main(int argc, char** argv) {
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(1920, 1080);
+    glutInitWindowSize(1200, 600);
     glutCreateWindow("Simple Physics Simulation");
+    glutDisplayFunc(display);
+
+    // Setup ImGui binding
+    ImGui::CreateContext();
+
+    ImGui_ImplFreeGLUT_Init();
+    ImGui_ImplFreeGLUT_InstallFuncs();
+    ImGui_ImplOpenGL2_Init();
 
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
@@ -307,12 +341,21 @@ int main(int argc, char** argv) {
     glLoadIdentity();
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+    
+    // Setup style
+    ImGui::StyleColorsDark();
 
     initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
-    glutDisplayFunc(display);
     glutIdleFunc(idle);
+
 
     // it will stick here until the program ends. 
     glutMainLoop();
+
+    // Cleanup
+    ImGui_ImplOpenGL2_Shutdown();
+    ImGui_ImplFreeGLUT_Shutdown();
+    ImGui::DestroyContext();
+
     return 0;
 }
