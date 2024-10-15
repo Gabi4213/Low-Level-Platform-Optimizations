@@ -49,7 +49,6 @@ void initScene(int boxCount, int sphereCount)
 {
     diagnosticsTracker = new DiagnosticsTracker();
 
-    // Clear the current colliders so that we can call this function in runtime and render new shapes
     for (ColliderObject* obj : colliders) 
     {
         delete obj;
@@ -253,7 +252,38 @@ void DrawImGui()
 
         if (ImGui::Button("Initialize Scene")) 
         {
-            initScene(numberOfBoxes, numberOfSpheres);  // Call initScene with current slider values
+            initScene(numberOfBoxes, numberOfSpheres);
+        }
+
+        if (ImGui::Button("Set 50"))
+        {
+            numberOfBoxes = 50;
+            numberOfSpheres = 50;
+            initScene(numberOfBoxes, numberOfSpheres);
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Set 100"))
+        {
+            numberOfBoxes = 100;
+            numberOfSpheres = 100;
+            initScene(numberOfBoxes, numberOfSpheres);
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Set 1000"))
+        {
+            numberOfBoxes = 1000;
+            numberOfSpheres = 1000;
+            initScene(numberOfBoxes, numberOfSpheres);
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Set 5000"))
+        {
+            numberOfBoxes = 5000;
+            numberOfSpheres = 5000;
+            initScene(numberOfBoxes, numberOfSpheres);
         }
     }
     ImGui::End();
