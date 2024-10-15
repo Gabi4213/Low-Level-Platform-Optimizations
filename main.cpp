@@ -10,19 +10,25 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include <string>
+#include <windows.h>
+#include <psapi.h>
+#include <vector>
+#include <deque>
 
 #include "globals.h"
 #include "Vec3.h"
 #include "ColliderObject.h"
 #include "Box.h"
 #include "Sphere.h"
-
+#include "DiagnosticsTracker.h"
 
 using namespace std::chrono;
 
 // this is the number of falling physical items. 
-#define NUMBER_OF_BOXES 50
-#define NUMBER_OF_SPHERES 50
+
+int numberOfBoxes = 50;
+int numberOfSpheres = 50;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
@@ -33,14 +39,24 @@ using namespace std::chrono;
 #define LOOKDIR_X 10
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
-
-
-
-
-
+    
 std::list<ColliderObject*> colliders;
 
-void initScene(int boxCount, int sphereCount) {
+DiagnosticsTracker* diagnosticsTracker;
+
+
+void initScene(int boxCount, int sphereCount)
+{
+    diagnosticsTracker = new DiagnosticsTracker();
+
+    // Clear the current colliders so that we can call this function in runtime and render new shapes
+    for (ColliderObject* obj : colliders) 
+    {
+        delete obj;
+    } 
+    colliders.clear();
+
+
     for (int i = 0; i < boxCount; ++i) {
         Box* box = new Box();
 
@@ -139,9 +155,6 @@ Vec3 screenToWorld(int x, int y) {
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-
-
-
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     
@@ -169,8 +182,6 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
     glVertex3f(v4.x, v4.y, v4.z);
     glEnd();
 }
-
-
 
 // draw the entire scene
 void drawScene() {
@@ -209,9 +220,43 @@ void drawScene() {
     }
 }
 
-void initGui() 
+void DrawImGui()
 {
-    ImGui::ShowDemoWindow();
+    ImGui::Begin("Statistics & Controls");
+
+    if (ImGui::CollapsingHeader("Diagnostic Data"))
+    {
+        //Memory
+        ImGui::Text("RAM Memory Usage: %s", diagnosticsTracker->GetMemoryUsage().c_str());
+
+        //CPU
+        std::string cpuUsage = diagnosticsTracker->GetCPUUsage() + "%";
+        ImGui::Text("CPU Usage: %s", cpuUsage.c_str());
+
+        //Frame Time
+        std::string frameTime = "Frame Time: " + diagnosticsTracker->GetFrameTime();
+        ImGui::Text(frameTime.c_str());
+
+        //FPS
+        std::string fps = "FPS: " + diagnosticsTracker->GetFPS() + "ms";
+        ImGui::Text(fps.c_str());
+
+        //Thread Count
+        std::string threadCount = "Thread Count: " + diagnosticsTracker->GetThreadCount();
+        ImGui::Text(threadCount.c_str());
+    }
+
+    if (ImGui::CollapsingHeader("Objects"))
+    {
+        ImGui::SliderInt("Number of Cubes", &numberOfBoxes, 100, 1000);
+        ImGui::SliderInt("Number of Spheres", &numberOfSpheres, 100, 1000);
+
+        if (ImGui::Button("Initialize Scene")) 
+        {
+            initScene(numberOfBoxes, numberOfSpheres);  // Call initScene with current slider values
+        }
+    }
+    ImGui::End();
 }
 
 // called by GLUT - displays the scene
@@ -221,11 +266,11 @@ void display()
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplFreeGLUT_NewFrame();
 
-    initGui();
+    DrawImGui();
 
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
-
+    
     glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -321,18 +366,17 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(1200, 600);
-    glutCreateWindow("Simple Physics Simulation");
+    glutCreateWindow("Physics Simulation - Gabriela Maczynska");
     glutDisplayFunc(display);
-
-    // Setup ImGui binding
-    ImGui::CreateContext();
-
-    ImGui_ImplFreeGLUT_Init();
-    ImGui_ImplFreeGLUT_InstallFuncs();
-    ImGui_ImplOpenGL2_Init();
 
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
+
+    // Setup ImGui binding
+    ImGui::CreateContext();
+    ImGui_ImplFreeGLUT_Init();
+    ImGui_ImplFreeGLUT_InstallFuncs();
+    ImGui_ImplOpenGL2_Init();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -345,9 +389,8 @@ int main(int argc, char** argv) {
     // Setup style
     ImGui::StyleColorsDark();
 
-    initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
+    initScene(numberOfBoxes, numberOfSpheres);
     glutIdleFunc(idle);
-
 
     // it will stick here until the program ends. 
     glutMainLoop();
@@ -356,6 +399,10 @@ int main(int argc, char** argv) {
     ImGui_ImplOpenGL2_Shutdown();
     ImGui_ImplFreeGLUT_Shutdown();
     ImGui::DestroyContext();
+
+    //Diagnositcs Tracker Cleanup
+    delete diagnosticsTracker;
+    diagnosticsTracker = nullptr;
 
     return 0;
 }
