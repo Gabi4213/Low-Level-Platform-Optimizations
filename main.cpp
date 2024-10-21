@@ -22,6 +22,7 @@
 #include "Box.h"
 #include "Sphere.h"
 #include "DiagnosticsTracker.h"
+#include "MemoryPool.h"
 
 using namespace std::chrono;
 
@@ -43,7 +44,6 @@ int numberOfSpheres = 50;
 std::list<ColliderObject*> colliders;
 
 DiagnosticsTracker* diagnosticsTracker;
-
 
 void initScene(int boxCount, int sphereCount)
 {
