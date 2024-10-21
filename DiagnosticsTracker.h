@@ -42,7 +42,7 @@ public:
 
 	void StartTimer(const std::string& functionName);
 	void StopTimer(const std::string& functionName);
-
+	
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();
 	std::string GetFrameTime();

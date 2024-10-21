@@ -256,12 +256,18 @@ void DrawImGui()
         //function run time
 
         //physics
-        std::string updatePhysicsRunTime = "updatePhysics RunTime: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics");
+        std::string updatePhysicsRunTime = "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics");
         ImGui::Text(updatePhysicsRunTime.c_str());
 
         //draw
-        std::string drawSceneRunTime = "drawScene RunTime: " + diagnosticsTracker->GetFunctionRunTime("drawScene");
+        std::string drawSceneRunTime = "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene");
         ImGui::Text(drawSceneRunTime.c_str());
+
+        if (ImGui::Button("Print Function Execution Times")) 
+        {
+            std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene") << std::endl;
+            std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics") << std::endl;
+        }
     }
 
     if (ImGui::CollapsingHeader("Objects"))
