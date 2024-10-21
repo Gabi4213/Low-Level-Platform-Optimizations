@@ -8,6 +8,7 @@
 #include <psapi.h>
 #include <vector>
 #include <deque>
+#include <unordered_map>
 
 using namespace std::chrono;
 
@@ -29,16 +30,24 @@ private:
 	std::chrono::high_resolution_clock::time_point lastUpdate;
 	float cpuUsage = 0.0f;
 
+	//Timer
+	std::unordered_map<std::string, std::chrono::microseconds> functionDurations;
+	std::unordered_map<std::string, time_point<high_resolution_clock>> startTimes;
+
 	void InitCPUStats();
 
 public:
 
 	DiagnosticsTracker();
 
+	void StartTimer(const std::string& functionName);
+	void StopTimer(const std::string& functionName);
+
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();
 	std::string GetFrameTime();
 	std::string GetFPS();
 	std::string GetThreadCount();
+	std::string GetFunctionRunTime(const std::string& functionName);
 };
 

@@ -164,11 +164,16 @@ void updatePhysics(const float deltaTime) {
     //  and add the pointer to that region's list.
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
+    diagnosticsTracker->StartTimer("updatePhysics");
+
+
     for (ColliderObject* box : colliders) { 
         
         box->update(&colliders, deltaTime);
         
     }
+
+    diagnosticsTracker->StopTimer("updatePhysics");
 }
 
 // draw the sides of the containing area
@@ -184,6 +189,8 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
 
 // draw the entire scene
 void drawScene() {
+
+    diagnosticsTracker->StartTimer("drawScene");
 
     // Draw the side wall
     GLfloat diffuseMaterial[] = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -217,6 +224,8 @@ void drawScene() {
     for (ColliderObject* box : colliders) {
         box->draw();
     }
+
+    diagnosticsTracker->StopTimer("drawScene");
 }
 
 void DrawImGui()
@@ -243,6 +252,16 @@ void DrawImGui()
         //Thread Count
         std::string threadCount = "Thread Count: " + diagnosticsTracker->GetThreadCount();
         ImGui::Text(threadCount.c_str());
+
+        //function run time
+
+        //physics
+        std::string updatePhysicsRunTime = "updatePhysics RunTime: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics");
+        ImGui::Text(updatePhysicsRunTime.c_str());
+
+        //draw
+        std::string drawSceneRunTime = "drawScene RunTime: " + diagnosticsTracker->GetFunctionRunTime("drawScene");
+        ImGui::Text(drawSceneRunTime.c_str());
     }
 
     if (ImGui::CollapsingHeader("Objects"))

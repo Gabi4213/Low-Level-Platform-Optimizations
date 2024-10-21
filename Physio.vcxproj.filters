@@ -31,7 +31,9 @@
     <ClCompile Include="Vec3.cpp">
       <Filter>Cpps</Filter>
     </ClCompile>
-    <ClCompile Include="DiagnosticsTracker.cpp" />
+    <ClCompile Include="DiagnosticsTracker.cpp">
+      <Filter>Cpps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -76,7 +78,9 @@
     <ClInclude Include="Vec3.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="DiagnosticsTracker.h" />
+    <ClInclude Include="DiagnosticsTracker.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

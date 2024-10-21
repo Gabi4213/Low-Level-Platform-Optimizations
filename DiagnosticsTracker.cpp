@@ -108,3 +108,23 @@ std::string DiagnosticsTracker::GetThreadCount()
 
     return std::to_string(threadCount);
 }
+
+
+void DiagnosticsTracker::StartTimer(const std::string& functionName)
+{
+    startTimes[functionName] = high_resolution_clock::now();
+}
+
+void DiagnosticsTracker::StopTimer(const std::string& functionName)
+{
+    auto stopTime = high_resolution_clock::now();
+
+    microseconds duration = duration_cast<microseconds>(stopTime - startTimes[functionName]);
+
+    functionDurations[functionName] = duration;
+}
+
+std::string DiagnosticsTracker::GetFunctionRunTime(const std::string& functionName)
+{
+    return std::to_string(functionDurations[functionName].count());
+}
