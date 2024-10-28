@@ -1,21 +1,24 @@
 #pragma once
-#include<array>
-#include <iostream>
 #include <cstddef>
+#include <vector>
+#include <iostream>
 #include <stdexcept>
 
 class MemoryPool
 {
-private:
-	~MemoryPool();
-
-	void* memoryPool;
-	size_t poolSize;
-	size_t poolOffset;
-
 public:
-	MemoryPool(size_t totalSize);
-	void* AllocateMemory(size_t size);
-	void DeallocateMemory(void* poolMemory);
-};
 
+    MemoryPool(size_t totalSize, size_t blocksSize);
+    ~MemoryPool();
+
+    void* AllocateMemory(size_t size);
+    void DeallocateMemory(void* poolMemory);
+
+private:
+
+    void* memoryPool;
+    size_t poolSize;
+    size_t blocksSize;
+    size_t poolOffset = 0;
+    std::vector<void*> freeList; 
+};

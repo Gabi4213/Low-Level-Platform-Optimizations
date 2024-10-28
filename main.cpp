@@ -56,7 +56,8 @@ void initScene(int boxCount, int sphereCount)
     colliders.clear();
 
 
-    for (int i = 0; i < boxCount; ++i) {
+    for (int i = 0; i < boxCount; ++i) 
+    {
         Box* box = new Box();
 
         // Assign random x, y, and z positions within specified ranges
