@@ -51,7 +51,14 @@ void initScene(int boxCount, int sphereCount)
 
     for (ColliderObject* obj : colliders) 
     {
-        delete obj;
+        if (Box* box = dynamic_cast<Box*>(obj))
+        {
+            Box::operator delete(obj, sizeof(Box));
+        }
+        else if (Sphere* sphere = dynamic_cast<Sphere*>(obj))
+        {
+            Sphere::operator delete(obj, sizeof(Sphere)); 
+        }
     } 
     colliders.clear();
 
