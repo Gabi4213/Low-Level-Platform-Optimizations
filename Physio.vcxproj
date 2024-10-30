@@ -181,6 +181,7 @@
     <ClCompile Include="imgui\imgui_impl_freeglut.cpp" />
     <ClCompile Include="imgui\imgui_impl_opengl2.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Vec3.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="imgui\stb_rect_pack.h" />
     <ClInclude Include="imgui\stb_textedit.h" />
     <ClInclude Include="imgui\stb_truetype.h" />
+    <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Vec3.h" />

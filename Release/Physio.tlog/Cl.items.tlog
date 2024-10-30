@@ -7,6 +7,7 @@ C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\imgui
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\imgui\imgui_impl_freeglut.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\imgui_impl_freeglut.obj
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\imgui\imgui_impl_opengl2.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\imgui_impl_opengl2.obj
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\main.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\main.obj
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\MemoryManager.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\MemoryManager.obj
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\MemoryPool.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\MemoryPool.obj
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Sphere.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\Sphere.obj
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.cpp;C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\Vec3.obj

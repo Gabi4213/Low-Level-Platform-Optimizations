@@ -34,7 +34,10 @@
     <ClCompile Include="DiagnosticsTracker.cpp">
       <Filter>Cpps</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryPool.cpp" />
+    <ClCompile Include="MemoryPool.cpp">
+      <Filter>Cpps</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -82,7 +85,10 @@
     <ClInclude Include="DiagnosticsTracker.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryPool.h" />
+    <ClInclude Include="MemoryPool.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
