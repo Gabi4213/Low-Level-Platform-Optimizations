@@ -1,4 +1,5 @@
 #include "DiagnosticsTracker.h"
+#include "MemoryManager.h"
 
 DiagnosticsTracker::DiagnosticsTracker() 
 {
@@ -107,6 +108,11 @@ std::string DiagnosticsTracker::GetThreadCount()
     ZeroMemory(&processInfo, sizeof(PROCESS_INFORMATION));
 
     return std::to_string(threadCount);
+}
+
+std::string DiagnosticsTracker::GetTotalMemoryAllocated() 
+{
+    return std::to_string(totalAllocatedMemory);
 }
 
 

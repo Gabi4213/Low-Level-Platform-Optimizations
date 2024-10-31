@@ -174,7 +174,6 @@ void updatePhysics(const float deltaTime) {
 
     diagnosticsTracker->StartTimer("updatePhysics");
 
-
     for (ColliderObject* box : colliders) { 
         
         box->update(&colliders, deltaTime);
@@ -260,6 +259,10 @@ void DrawImGui()
         //Thread Count
         std::string threadCount = "Thread Count: " + diagnosticsTracker->GetThreadCount();
         ImGui::Text(threadCount.c_str());
+
+        //Total Memory Allocation
+        std::string totalMemoryAllocation = "Total Memory Allocation: " + diagnosticsTracker->GetTotalMemoryAllocated();
+        ImGui::Text(totalMemoryAllocation.c_str());
 
         //function run time
 

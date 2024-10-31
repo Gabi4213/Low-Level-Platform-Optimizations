@@ -49,5 +49,6 @@ public:
 	std::string GetFPS();
 	std::string GetThreadCount();
 	std::string GetFunctionRunTime(const std::string& functionName);
+	std::string GetTotalMemoryAllocated();
 };
 
