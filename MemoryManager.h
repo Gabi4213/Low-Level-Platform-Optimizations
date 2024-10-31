@@ -18,3 +18,6 @@ struct Footer
 {
 	unsigned int guardValue;
 };
+
+extern Header* firstAllocation;
+extern Header* lastAllocation;
