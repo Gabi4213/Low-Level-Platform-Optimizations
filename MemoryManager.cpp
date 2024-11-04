@@ -9,7 +9,7 @@ Header* lastAllocation{ nullptr };
 
 void* operator new (size_t size)
 {
-	std::cout << "new operator is being called" << std::endl;
+	//std::cout << "new operator is being called" << std::endl;
 
 	size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
 	char* poolMemory = (char*)malloc(totalSize);
@@ -22,8 +22,8 @@ void* operator new (size_t size)
 	Header* headerPtr = (Header*)poolMemory;
 	headerPtr->size = size;
 	headerPtr->guardValue = GUARD_VALUE;
-	headerPtr->nextHeader = nullptr;
 	headerPtr->previousHeader = lastAllocation;
+	headerPtr->nextHeader = nullptr;
 
 	if (lastAllocation != nullptr)
 	{
@@ -54,7 +54,7 @@ void operator delete (void* poolMemory)
 		return;
 	}
 
-	std::cout << "delete operator is being called" << std::endl;
+	//std::cout << "delete operator is being called" << std::endl;
 
 	Header* headerPtr = (Header*)((char*)poolMemory - sizeof(Header));
 	Footer* footerPtr = (Footer*)((char*)poolMemory + headerPtr->size);

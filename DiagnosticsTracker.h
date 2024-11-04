@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
@@ -42,6 +43,8 @@ public:
 
 	void StartTimer(const std::string& functionName);
 	void StopTimer(const std::string& functionName);
+
+	void WalkTheHeap();
 	
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();

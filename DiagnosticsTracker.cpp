@@ -134,3 +134,19 @@ std::string DiagnosticsTracker::GetFunctionRunTime(const std::string& functionNa
 {
     return std::to_string(functionDurations[functionName].count());
 }
+
+void DiagnosticsTracker::WalkTheHeap()
+{
+    Header* currentHeader = firstAllocation;
+
+    while (currentHeader != nullptr)
+    {
+        Footer* currentFooter = (Footer*)((char*)currentHeader + sizeof(Header) + currentHeader->size);
+
+        std::cout << "Current Header at: " << currentHeader<< "\n\tGuard Value: " << currentHeader->guardValue<< "\n\tPrevious Header: " << currentHeader->previousHeader<< "\n\tNext Header: " << currentHeader->nextHeader;
+
+        std::cout << "\nCurrent Footer at: " << currentFooter << "\n\tGuard Value: " << currentFooter->guardValue << "\n\tSize: " << currentHeader->size << "\n\n";
+
+        currentHeader = currentHeader->nextHeader;
+    }
+} 

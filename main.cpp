@@ -279,6 +279,11 @@ void DrawImGui()
             std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene") << std::endl;
             std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics") << std::endl;
         }
+
+        if (ImGui::Button("Walk The Heap"))
+        {
+            diagnosticsTracker->WalkTheHeap();
+        }
     }
 
     if (ImGui::CollapsingHeader("Objects"))
