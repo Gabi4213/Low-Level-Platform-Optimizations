@@ -45,6 +45,7 @@ public:
 	void StopTimer(const std::string& functionName);
 
 	void WalkTheHeap();
+	void OutputMemoryAllocation();
 	
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();

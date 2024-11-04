@@ -150,3 +150,8 @@ void DiagnosticsTracker::WalkTheHeap()
         currentHeader = currentHeader->nextHeader;
     }
 } 
+
+void DiagnosticsTracker::OutputMemoryAllocation() 
+{
+    std::cout << "\nBytes Allocated: " << memoryAllocation.bytesAllocated << "\nBytes Deallocated: " << memoryAllocation.bytesDeallocated << "\nBytes: " << memoryAllocation.bytes << "\n\n";
+}

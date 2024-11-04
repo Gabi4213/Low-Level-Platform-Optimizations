@@ -284,6 +284,11 @@ void DrawImGui()
         {
             diagnosticsTracker->WalkTheHeap();
         }
+
+        if (ImGui::Button("Output Memory Allocation"))
+        {
+            diagnosticsTracker->OutputMemoryAllocation();
+        }
     }
 
     if (ImGui::CollapsingHeader("Objects"))

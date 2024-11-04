@@ -7,11 +7,17 @@ size_t totalAllocatedMemory = 0;
 Header* firstAllocation{ nullptr };
 Header* lastAllocation{ nullptr };
 
+MemoryAllocation memoryAllocation;
+
 void* operator new (size_t size)
 {
 	//std::cout << "new operator is being called" << std::endl;
 
 	size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
+
+	memoryAllocation.bytesAllocated += totalSize;
+	memoryAllocation.bytes += totalSize;
+
 	char* poolMemory = (char*)malloc(totalSize);
 
 	if (poolMemory == nullptr)
@@ -90,6 +96,9 @@ void operator delete (void* poolMemory)
 	}
 
 	totalAllocatedMemory -= headerPtr->size;
+
+	memoryAllocation.bytesDeallocated += sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
+	memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
 
 	free(headerPtr);
 }
