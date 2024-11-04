@@ -101,13 +101,7 @@ std::string DiagnosticsTracker::GetFPS()
 
 std::string DiagnosticsTracker::GetThreadCount() 
 {
-    HANDLE hProcess = GetCurrentProcess();
-    DWORD threadCount = 0; 
-
-    PROCESS_INFORMATION processInfo;
-    ZeroMemory(&processInfo, sizeof(PROCESS_INFORMATION));
-
-    return std::to_string(threadCount);
+    return std::to_string(MAX_THREADS);
 }
 
 std::string DiagnosticsTracker::GetTotalMemoryAllocated() 
