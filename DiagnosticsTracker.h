@@ -10,6 +10,7 @@
 #include <vector>
 #include <deque>
 #include <unordered_map>
+#include "Octree.h"
 
 using namespace std::chrono;
 
@@ -46,6 +47,7 @@ public:
 
 	void WalkTheHeap();
 	void OutputMemoryAllocation();
+	void DisplayOctree(Octree* node, int depth = 0);
 	
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();

@@ -46,9 +46,13 @@ std::list<ColliderObject*> colliders;
 
 DiagnosticsTracker* diagnosticsTracker;
 
+Octree* octree;
+
 void initScene(int boxCount, int sphereCount)
 {
     diagnosticsTracker = new DiagnosticsTracker();
+
+    octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
 
     for (ColliderObject* obj : colliders) 
     {
@@ -168,7 +172,7 @@ void updatePhysics(const float deltaTime) {
     
     diagnosticsTracker->StartTimer("updatePhysics");
 
-    Octree* octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
+    octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
 
     for (ColliderObject* collider : colliders) 
     {
@@ -194,7 +198,7 @@ void updatePhysics(const float deltaTime) {
         collider->update(deltaTime);
     }
 
-    delete octree;
+    octree->colliders.clear();
 
     diagnosticsTracker->StopTimer("updatePhysics");
 }
@@ -305,6 +309,14 @@ void DrawImGui()
         {
             diagnosticsTracker->OutputMemoryAllocation();
         }
+
+        if (ImGui::Button("Output Octree Structure"))
+        {
+            if (octree != nullptr)
+            {
+                diagnosticsTracker->DisplayOctree(octree);
+            }
+        }
     }
 
     if (ImGui::CollapsingHeader("Objects"))
@@ -348,8 +360,10 @@ void DrawImGui()
             initScene(numberOfBoxes, numberOfSpheres);
         }
     }
+
     ImGui::End();
 }
+
 
 // called by GLUT - displays the scene
 void display() 
