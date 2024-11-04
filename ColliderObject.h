@@ -70,7 +70,7 @@ public:
 
     virtual void drawMesh() {};
 
-    void update(std::list<ColliderObject*>* colliders, const float& deltaTime)
+    void update(const float& deltaTime)
     {
         const float floorY = 0.0f;
         // Update velocity due to gravity
@@ -96,14 +96,14 @@ public:
             velocity.z = -velocity.z;
         }
 
-        // Check for collisions with other colliders
-        for (ColliderObject* other : *colliders) {
-            if (this == other) continue;
-            if (checkCollision(this, other)) {
-                resolveCollision(this, other);
-                break;
-            }
-        }
+        //// Check for collisions with other colliders
+        //for (ColliderObject* other : *colliders) {
+        //    if (this == other) continue;
+        //    if (checkCollision(this, other)) {
+        //        resolveCollision(this, other);
+        //        break;
+        //    }
+        //}
     }
 };
 

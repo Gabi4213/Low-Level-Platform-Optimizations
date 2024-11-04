@@ -23,6 +23,7 @@
 #include "Sphere.h"
 #include "DiagnosticsTracker.h"
 #include "MemoryPool.h"
+#include "Octree.h"
 
 using namespace std::chrono;
 
@@ -165,20 +166,35 @@ Vec3 screenToWorld(int x, int y) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     
-    // todo for the assessment - use a thread for each sub region
-    // for example, assuming we have two regions:
-    // from 'colliders' create two separate lists
-    // empty each list (from previous frame) and work out which collidable object is in which region, 
-    //  and add the pointer to that region's list.
-    // Then, run two threads with the code below (changing 'colliders' to be the region's list)
-
     diagnosticsTracker->StartTimer("updatePhysics");
 
-    for (ColliderObject* box : colliders) { 
-        
-        box->update(&colliders, deltaTime);
-        
+    Octree* octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
+
+    for (ColliderObject* collider : colliders) 
+    {
+        octree->Insert(collider);
     }
+
+    for (ColliderObject* collider : colliders)
+    {
+        std::list<ColliderObject*> possibleColliders;
+        octree->Query(collider, possibleColliders);
+
+        for (ColliderObject* other : possibleColliders)
+        {
+            if (collider != other)
+            {
+                if (collider->checkCollision(collider, other))
+                {
+                    collider->resolveCollision(collider, other);
+                }
+            }
+        }
+
+        collider->update(deltaTime);
+    }
+
+    delete octree;
 
     diagnosticsTracker->StopTimer("updatePhysics");
 }

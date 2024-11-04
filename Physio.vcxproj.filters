@@ -38,6 +38,7 @@
       <Filter>Cpps</Filter>
     </ClCompile>
     <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="Octree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -89,6 +90,7 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="Octree.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
