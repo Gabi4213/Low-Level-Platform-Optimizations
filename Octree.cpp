@@ -2,6 +2,8 @@
 
 Octree::Octree(const Vec3& center, const Vec3& halfSize, int depth) : center(center), halfSize(halfSize)
 {
+
+
     for (int i = 0; i < CHILDREN_COUNT; ++i)
     {
         children[i] = nullptr;
@@ -23,8 +25,6 @@ void Octree::Insert(ColliderObject* collider)
 {
     if (!IsInside(collider->position)) return;
 
-    std::lock_guard<std::mutex> lock(mutex);
-
     if (colliders.size() < MAX_OBJECTS || DEPTH <= 0)
     {
         colliders.push_back(collider);
@@ -35,28 +35,9 @@ void Octree::Insert(ColliderObject* collider)
         {
             Subdivide();
         }
-
-        std::vector<std::future<void>> futures;
         for (int i = 0; i < CHILDREN_COUNT; ++i)
         {
-            if (futures.size() < MAX_THREADS) 
-            {
-                futures.emplace_back(std::async(std::launch::async, [&] {children[i]->Insert(collider);}));
-            }
-            else 
-            {
-                for (auto& future : futures)
-                {
-                    future.get();
-                }
-                futures.clear();
-                futures.emplace_back(std::async(std::launch::async, [&] {children[i]->Insert(collider); }));
-            }
-        }
-
-        for (auto& future : futures) 
-        {
-            future.get();
+            children[i]->Insert(collider);
         }
     }
 }
@@ -65,47 +46,23 @@ void Octree::Query(const ColliderObject* collider, std::list<ColliderObject*>& p
 {
     if (!IsInside(collider->position)) return;
 
+    for (auto* obj : colliders)
     {
-        std::lock_guard<std::mutex> lock(mutex); // Lock the mutex
-        for (auto* obj : colliders)
-        {
-            possibleColliders.push_back(obj);
-        }
+        possibleColliders.push_back(obj);
     }
 
-    std::vector<std::future<void>> futures;
     if (children[0])
     {
         for (int i = 0; i < CHILDREN_COUNT; ++i)
         {
-
-            if (futures.size() < MAX_THREADS) 
-            {
-                futures.emplace_back(std::async(std::launch::async, [&] {children[i]->Query(collider, possibleColliders);}));
-            }
-            else 
-            {
-                for (auto& future : futures)
-                {
-                    future.get();
-                }
-                futures.clear();
-                futures.emplace_back(std::async(std::launch::async, [&] {children[i]->Query(collider, possibleColliders);}));
-            }
-        }
-
-        for (auto& future : futures) 
-        {
-            future.get();
+            children[i]->Query(collider, possibleColliders);
         }
     }
 }
 
 bool Octree::IsInside(const Vec3& point) const
 {
-    return (point.x >= center.x - halfSize.x && point.x <= center.x + halfSize.x &&
-        point.y >= center.y - halfSize.y && point.y <= center.y + halfSize.y &&
-        point.z >= center.z - halfSize.z && point.z <= center.z + halfSize.z);
+    return (point.x >= center.x - halfSize.x && point.x <= center.x + halfSize.x && point.y >= center.y - halfSize.y && point.y <= center.y + halfSize.y && point.z >= center.z - halfSize.z && point.z <= center.z + halfSize.z);
 }
 
 void Octree::Subdivide()

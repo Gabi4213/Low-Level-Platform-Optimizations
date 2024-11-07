@@ -7,13 +7,13 @@ void* operator new (size_t size);
 void operator delete (void* poolMemory);
 
 
-struct MemoryAllocation 
+struct MemoryAllocation
 {
 	size_t bytesAllocated;
 	size_t bytesDeallocated;
 	size_t bytes;
 
-	MemoryAllocation() 
+	MemoryAllocation()
 	{
 		this->bytesAllocated = 0;
 		this->bytesDeallocated = 0;
@@ -21,7 +21,7 @@ struct MemoryAllocation
 	}
 };
 
-struct Header 
+struct Header
 {
 	size_t size;
 	Header* nextHeader;
@@ -29,7 +29,7 @@ struct Header
 	unsigned int guardValue;
 };
 
-struct Footer 
+struct Footer
 {
 	unsigned int guardValue;
 };

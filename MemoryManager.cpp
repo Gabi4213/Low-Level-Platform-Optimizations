@@ -10,103 +10,102 @@ Header* lastAllocation{ nullptr };
 
 MemoryAllocation memoryAllocation;
 
-// Mutex for thread-safe operations
-std::mutex memoryMutex;
+std::mutex mutex;
 
-void* operator new(size_t size)
+void* operator new (size_t size)
 {
-    std::lock_guard<std::mutex> lock(memoryMutex); // Lock for thread safety
+	//std::cout << "new operator is being called" << std::endl;
 
-    size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
+	std::lock_guard<std::mutex> lock(mutex);
 
-    memoryAllocation.bytesAllocated += totalSize;
-    memoryAllocation.bytes += totalSize;
+	size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
 
-    char* poolMemory = (char*)malloc(totalSize);
+	memoryAllocation.bytesAllocated += totalSize;
+	memoryAllocation.bytes += totalSize;
 
-    if (poolMemory == nullptr)
-    {
-        throw std::bad_alloc();
-    }
+	char* poolMemory = (char*)malloc(totalSize);
 
-    Header* headerPtr = (Header*)poolMemory;
-    headerPtr->size = size;
-    headerPtr->guardValue = GUARD_VALUE;
-    headerPtr->previousHeader = lastAllocation;
-    headerPtr->nextHeader = nullptr;
+	if (poolMemory == nullptr)
+	{
+		throw std::bad_alloc();
+	}
 
-    if (lastAllocation != nullptr)
-    {
-        lastAllocation->nextHeader = headerPtr;
-    }
+	Header* headerPtr = (Header*)poolMemory;
+	headerPtr->size = size;
+	headerPtr->guardValue = GUARD_VALUE;
+	headerPtr->previousHeader = lastAllocation;
+	headerPtr->nextHeader = nullptr;
 
-    lastAllocation = headerPtr;
+	if (lastAllocation != nullptr)
+	{
+		lastAllocation->nextHeader = headerPtr;
+	}
 
-    if (firstAllocation == nullptr)
-    {
-        firstAllocation = headerPtr;
-    }
+	lastAllocation = headerPtr;
 
-    Footer* footerPtr = (Footer*)(poolMemory + sizeof(Header) + size);
-    footerPtr->guardValue = GUARD_VALUE;
+	if (firstAllocation == nullptr)
+	{
+		firstAllocation = headerPtr;
+	}
 
-    totalAllocatedMemory += size;
+	Footer* footerPtr = (Footer*)(poolMemory + sizeof(Header) + size);
+	footerPtr->guardValue = GUARD_VALUE;
 
-    void* pStartMemBlock = poolMemory + sizeof(Header);
-    return pStartMemBlock;
+	totalAllocatedMemory += size;
+
+	void* pStartMemBlock = poolMemory + sizeof(Header);
+	return pStartMemBlock;
 }
 
-void operator delete(void* poolMemory)
+void operator delete (void* poolMemory)
 {
-    if (poolMemory == nullptr)
-    {
-        std::cout << "poolMemory is nullptr. Nothing to delete" << std::endl;
-        return;
-    }
+	if (poolMemory == nullptr)
+	{
+		std::cout << "poolMemory is nullptr. Nothing to delete" << std::endl;
+		return;
+	}
 
-    std::lock_guard<std::mutex> lock(memoryMutex); // Lock for thread safety
+	std::lock_guard<std::mutex> lock(mutex);
 
-    Header* headerPtr = (Header*)((char*)poolMemory - sizeof(Header));
-    Footer* footerPtr = (Footer*)((char*)poolMemory + headerPtr->size);
+	//std::cout << "delete operator is being called" << std::endl;
 
-    if (headerPtr == firstAllocation)
-    {
-        firstAllocation = headerPtr->nextHeader;
-    }
-    else
-    {
-        if (headerPtr->previousHeader != nullptr) { // Protect against nullptr dereference
-            headerPtr->previousHeader->nextHeader = headerPtr->nextHeader;
-        }
-    }
+	Header* headerPtr = (Header*)((char*)poolMemory - sizeof(Header));
+	Footer* footerPtr = (Footer*)((char*)poolMemory + headerPtr->size);
 
-    if (headerPtr == lastAllocation)
-    {
-        lastAllocation = headerPtr->previousHeader;
-    }
-    else
-    {
-        if (headerPtr->nextHeader != nullptr) { // Protect against nullptr dereference
-            headerPtr->nextHeader->previousHeader = headerPtr->previousHeader;
-        }
-    }
+	if (headerPtr == firstAllocation)
+	{
+		firstAllocation = headerPtr->nextHeader;
+	}
+	else
+	{
+		headerPtr->previousHeader->nextHeader = headerPtr->nextHeader;
+	}
 
-    if (headerPtr->guardValue != GUARD_VALUE)
-    {
-        std::cout << "header guard value doesn't match!" << std::endl;
-        return;
-    }
+	if (headerPtr == lastAllocation)
+	{
+		lastAllocation = headerPtr->previousHeader;
+	}
+	else
+	{
+		headerPtr->nextHeader->previousHeader = headerPtr->previousHeader;
+	}
 
-    if (footerPtr->guardValue != GUARD_VALUE)
-    {
-        std::cout << "footer guard value doesn't match!" << std::endl;
-        return;
-    }
+	if (headerPtr->guardValue != GUARD_VALUE)
+	{
+		std::cout << "header guard value doesnt match!" << std::endl;
+		return;
+	}
 
-    totalAllocatedMemory -= headerPtr->size;
+	if (footerPtr->guardValue != GUARD_VALUE)
+	{
+		std::cout << "footer guard value doesnt match!" << std::endl;
+		return;
+	}
 
-    memoryAllocation.bytesDeallocated += sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
-    memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
+	totalAllocatedMemory -= headerPtr->size;
 
-    free(headerPtr); // Free the entire block including header and footer
+	memoryAllocation.bytesDeallocated += sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
+	memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
+
+	free(headerPtr);
 }

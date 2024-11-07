@@ -16,6 +16,9 @@
 #include <vector>
 #include <deque>
 
+#include <thread>
+#include <mutex>
+
 #include "globals.h"
 #include "Vec3.h"
 #include "ColliderObject.h"
@@ -41,20 +44,22 @@ int numberOfSpheres = 50;
 #define LOOKDIR_X 10
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
-    
+
+#define MAX_THREADS 4
+
 std::list<ColliderObject*> colliders;
 
 DiagnosticsTracker* diagnosticsTracker;
 
 Octree* octree;
 
+std::vector<std::thread> threads;
+
 void initScene(int boxCount, int sphereCount)
 {
     diagnosticsTracker = new DiagnosticsTracker();
 
-    octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
-
-    for (ColliderObject* obj : colliders) 
+    for (ColliderObject* obj : colliders)
     {
         if (Box* box = dynamic_cast<Box*>(obj))
         {
@@ -62,13 +67,13 @@ void initScene(int boxCount, int sphereCount)
         }
         else if (Sphere* sphere = dynamic_cast<Sphere*>(obj))
         {
-            Sphere::operator delete(obj, sizeof(Sphere)); 
+            Sphere::operator delete(obj, sizeof(Sphere));
         }
-    } 
+    }
     colliders.clear();
 
 
-    for (int i = 0; i < boxCount; ++i) 
+    for (int i = 0; i < boxCount; ++i)
     {
         Box* box = new Box();
 
@@ -77,11 +82,11 @@ void initScene(int boxCount, int sphereCount)
         box->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
         box->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
 
-        box->size = {1.0f, 1.0f, 1.0f};
+        box->size = { 1.0f, 1.0f, 1.0f };
 
         // Assign random x-velocity between -1.0f and 1.0f
         float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
-        box->velocity = {randomXVelocity, 0.0f, 0.0f};
+        box->velocity = { randomXVelocity, 0.0f, 0.0f };
 
         // Assign a random color to the box
         box->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
@@ -167,18 +172,8 @@ Vec3 screenToWorld(int x, int y) {
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-// update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime) {
-    
-    diagnosticsTracker->StartTimer("updatePhysics");
-
-    octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
-
-    for (ColliderObject* collider : colliders) 
-    {
-        octree->Insert(collider);
-    }
-
+void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
+{
     for (ColliderObject* collider : colliders)
     {
         std::list<ColliderObject*> possibleColliders;
@@ -188,24 +183,69 @@ void updatePhysics(const float deltaTime) {
         {
             if (collider != other)
             {
+                std::lock_guard<std::mutex> lock(mutex);
+
                 if (collider->checkCollision(collider, other))
                 {
                     collider->resolveCollision(collider, other);
                 }
             }
         }
+    }
+}
 
+// update the physics: gravity, collision test, collision resolution
+void updatePhysics(const float deltaTime)
+{
+    diagnosticsTracker->StartTimer("updatePhysics");
+
+    octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
+
+    for (ColliderObject* collider : colliders)
+    {
+        octree->Insert(collider);
+    }
+
+    int colldidersPerThreads = colliders.size() / MAX_THREADS;
+    auto itterator = colliders.begin();
+    std::mutex mutex;
+
+    for (int i = 0; i < MAX_THREADS; i++)
+    {
+        std::list<ColliderObject*> chunks;
+
+        for (int j = 0; j < colldidersPerThreads; j++)
+        {
+            if (itterator != colliders.end())
+            {
+                chunks.push_back(*itterator);
+                itterator++;
+            }
+        }
+
+        threads.push_back(std::thread(UpdateColliders, chunks, std::ref(mutex)));
+    }
+
+    for (ColliderObject* collider : colliders)
+    {
         collider->update(deltaTime);
     }
 
-    octree->colliders.clear();
+
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    threads.clear();
+    delete octree;
 
     diagnosticsTracker->StopTimer("updatePhysics");
 }
 
 // draw the sides of the containing area
 void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
-    
+
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
     glVertex3f(v2.x, v2.y, v2.z);
@@ -220,7 +260,7 @@ void drawScene() {
     diagnosticsTracker->StartTimer("drawScene");
 
     // Draw the side wall
-    GLfloat diffuseMaterial[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    GLfloat diffuseMaterial[] = { 0.2f, 0.2f, 0.2f, 1.0f };
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseMaterial);
 
     // Draw the left side wall
@@ -294,7 +334,7 @@ void DrawImGui()
         std::string drawSceneRunTime = "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene");
         ImGui::Text(drawSceneRunTime.c_str());
 
-        if (ImGui::Button("Print Function Execution Times")) 
+        if (ImGui::Button("Print Function Execution Times"))
         {
             std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene") << std::endl;
             std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics") << std::endl;
@@ -309,14 +349,6 @@ void DrawImGui()
         {
             diagnosticsTracker->OutputMemoryAllocation();
         }
-
-        if (ImGui::Button("Output Octree Structure"))
-        {
-            if (octree != nullptr)
-            {
-                diagnosticsTracker->DisplayOctree(octree);
-            }
-        }
     }
 
     if (ImGui::CollapsingHeader("Objects"))
@@ -324,7 +356,7 @@ void DrawImGui()
         ImGui::SliderInt("Number of Cubes", &numberOfBoxes, 100, 1000);
         ImGui::SliderInt("Number of Spheres", &numberOfSpheres, 100, 1000);
 
-        if (ImGui::Button("Initialize Scene")) 
+        if (ImGui::Button("Initialize Scene"))
         {
             initScene(numberOfBoxes, numberOfSpheres);
         }
@@ -360,13 +392,11 @@ void DrawImGui()
             initScene(numberOfBoxes, numberOfSpheres);
         }
     }
-
     ImGui::End();
 }
 
-
 // called by GLUT - displays the scene
-void display() 
+void display()
 {
     //imgui new frame
     ImGui_ImplOpenGL2_NewFrame();
@@ -376,7 +406,7 @@ void display()
 
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
-    
+
     glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -491,7 +521,7 @@ int main(int argc, char** argv) {
     glLoadIdentity();
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
-    
+
     // Setup style
     ImGui::StyleColorsDark();
 

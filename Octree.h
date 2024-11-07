@@ -1,9 +1,6 @@
 #pragma once
 #include <vector>
 #include <list>
-#include <thread>
-#include <mutex>
-#include <future>
 
 #include "ColliderObject.h"
 #include "Vec3.h"
@@ -11,7 +8,6 @@
 #define DEPTH 5
 #define MAX_OBJECTS 4
 #define CHILDREN_COUNT 8
-#define MAX_THREADS 4
 
 class Octree
 {
@@ -31,6 +27,4 @@ public:
 private:
     bool IsInside(const Vec3& point) const;
     void Subdivide();
-
-    std::mutex mutex;
 };

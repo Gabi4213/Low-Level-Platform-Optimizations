@@ -1,7 +1,7 @@
 #include "DiagnosticsTracker.h"
 #include "MemoryManager.h"
 
-DiagnosticsTracker::DiagnosticsTracker() 
+DiagnosticsTracker::DiagnosticsTracker()
 {
     InitCPUStats();
     lastUpdate = std::chrono::high_resolution_clock::now();
@@ -99,12 +99,18 @@ std::string DiagnosticsTracker::GetFPS()
     return std::to_string(fps);
 }
 
-std::string DiagnosticsTracker::GetThreadCount() 
+std::string DiagnosticsTracker::GetThreadCount()
 {
-    return std::to_string(MAX_THREADS);
+    HANDLE hProcess = GetCurrentProcess();
+    DWORD threadCount = 0;
+
+    PROCESS_INFORMATION processInfo;
+    ZeroMemory(&processInfo, sizeof(PROCESS_INFORMATION));
+
+    return std::to_string(threadCount);
 }
 
-std::string DiagnosticsTracker::GetTotalMemoryAllocated() 
+std::string DiagnosticsTracker::GetTotalMemoryAllocated()
 {
     return std::to_string(totalAllocatedMemory);
 }
@@ -137,40 +143,15 @@ void DiagnosticsTracker::WalkTheHeap()
     {
         Footer* currentFooter = (Footer*)((char*)currentHeader + sizeof(Header) + currentHeader->size);
 
-        std::cout << "Current Header at: " << currentHeader<< "\n\tGuard Value: " << currentHeader->guardValue<< "\n\tPrevious Header: " << currentHeader->previousHeader<< "\n\tNext Header: " << currentHeader->nextHeader;
+        std::cout << "Current Header at: " << currentHeader << "\n\tGuard Value: " << currentHeader->guardValue << "\n\tPrevious Header: " << currentHeader->previousHeader << "\n\tNext Header: " << currentHeader->nextHeader;
 
         std::cout << "\nCurrent Footer at: " << currentFooter << "\n\tGuard Value: " << currentFooter->guardValue << "\n\tSize: " << currentHeader->size << "\n\n";
 
         currentHeader = currentHeader->nextHeader;
     }
-} 
-
-void DiagnosticsTracker::OutputMemoryAllocation() 
-{
-    std::cout << "\nBytes Allocated: " << memoryAllocation.bytesAllocated << "\nBytes Deallocated: " << memoryAllocation.bytesDeallocated << "\nBytes: " << memoryAllocation.bytes << "\n\n";
 }
 
-void DiagnosticsTracker::DisplayOctree(Octree* node, int depth)
+void DiagnosticsTracker::OutputMemoryAllocation()
 {
-    std::string nodeLabel = "Node at: " + std::to_string(node->center.x) + ", " + std::to_string(node->center.y) + ", "+ std::to_string(node->center.z);
-
-    std::string indent(depth * 2, ' ');
-
-    std::cout << indent << nodeLabel << std::endl;
-
-    std::cout << indent << "Colliders: " << node->colliders.size() << std::endl;
-
-    int objIndex = 0;
-    for (auto* obj : node->colliders)
-    {
-        std::cout << indent << "  Collider: " << objIndex++<< "-Position: " << obj->position.x << ", "<< obj->position.y << ", " << obj->position.z << std::endl;
-    }
-
-    for (int i = 0; i < CHILDREN_COUNT; ++i)
-    {
-        if (node->children[i])
-        {
-            DisplayOctree(node->children[i], depth + 1);
-        }
-    }
+    std::cout << "\nBytes Allocated: " << memoryAllocation.bytesAllocated << "\nBytes Deallocated: " << memoryAllocation.bytesDeallocated << "\nBytes: " << memoryAllocation.bytes << "\n\n";
 }
