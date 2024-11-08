@@ -513,7 +513,7 @@ void DrawImGui()
     }
     if (ImGui::CollapsingHeader("Threads"))
     {
-        ImGui::SliderInt("Number of Threads", &maxThreads, 1, 20);
+        ImGui::SliderInt("Number of Threads", &maxThreads, 1, std::thread::hardware_concurrency());
     }
     if (ImGui::CollapsingHeader("Octree"))
     {
