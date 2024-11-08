@@ -168,12 +168,24 @@ void DiagnosticsTracker::OutputSphereMemoryAllocation()
 
 void DiagnosticsTracker::TriggerBufferOverflow()
 {
-    int* intArray = new int[10];
+    int* x = new int[10];
 
     for (int i = 0; i < 15; i++) 
     {
-        intArray[i] = i;
+        x[i] = i;
     }
 
-    delete[] intArray;
+    delete[] x;
+}
+
+void DiagnosticsTracker::AllocateMemory(int size)
+{
+    testArray = new int[size];
+    std::cout << "\nBytes Allocated 4 * " << size << "= " << memoryAllocation.bytesSize << std::endl;
+}
+
+void DiagnosticsTracker::DeallocateMemory()
+{
+    delete[] testArray;
+    std::cout << "\nBytes Deallocated, Current Size: " << memoryAllocation.bytesSize << std::endl;
 }

@@ -36,6 +36,8 @@ int numberOfSpheres = 50;
 int octreeDepth = 5;
 int octreeMaxObjects = 4;
 
+int memoryAllocatedSize = 10;
+
 size_t boxTotalBytesAllocated = 1024;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
@@ -358,7 +360,9 @@ void DrawImGui()
             std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene") << std::endl;
             std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics") << std::endl;
         }
-
+    }
+    if (ImGui::CollapsingHeader("Memory Management"))
+    {
         if (ImGui::Button("Walk The Heap"))
         {
             diagnosticsTracker->WalkTheHeap();
@@ -382,6 +386,18 @@ void DrawImGui()
         if (ImGui::Button("Trigger Buffer Overflow"))
         {
             diagnosticsTracker->TriggerBufferOverflow();
+        }
+
+        ImGui::Text("Demonstration of ‘global new and delete’");
+        ImGui::SliderInt("Memory to Allocate", &memoryAllocatedSize, 0, 50);
+
+        if (ImGui::Button("Allocate Memory"))
+        {
+            diagnosticsTracker->AllocateMemory(memoryAllocatedSize);
+        }
+        if (ImGui::Button("Deallocate Memory"))
+        {
+            diagnosticsTracker->DeallocateMemory();
         }
     }
 

@@ -22,6 +22,7 @@ void* operator new (size_t size)
 
 	memoryAllocation.bytesAllocated += totalSize;
 	memoryAllocation.bytes += totalSize;
+	memoryAllocation.bytesSize = size;
 
 	char* poolMemory = (char*)malloc(totalSize);
 
@@ -103,6 +104,8 @@ void operator delete (void* poolMemory)
 	}
 
 	totalAllocatedMemory -= headerPtr->size;
+
+	memoryAllocation.bytesSize = 0;
 
 	memoryAllocation.bytesDeallocated += sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
 	memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);

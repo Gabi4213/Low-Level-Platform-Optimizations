@@ -12,6 +12,8 @@ struct MemoryAllocation
 	size_t bytesDeallocated;
 	size_t bytes;
 
+	size_t bytesSize;
+
 	MemoryAllocation()
 	{
 		this->bytesAllocated = 0;

@@ -37,6 +37,8 @@ private:
 	std::unordered_map<std::string, std::chrono::microseconds> functionDurations;
 	std::unordered_map<std::string, time_point<high_resolution_clock>> startTimes;
 
+	int* testArray;
+
 	void InitCPUStats();
 
 public:
@@ -53,6 +55,9 @@ public:
 	void OutputSphereMemoryAllocation();
 
 	void TriggerBufferOverflow();
+
+	void AllocateMemory(int size);
+	void DeallocateMemory();
 
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();
