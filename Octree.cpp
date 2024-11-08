@@ -1,8 +1,24 @@
 #include "Octree.h"
 
-Octree::Octree(const Vec3& center, const Vec3& halfSize, int depth) : center(center), halfSize(halfSize)
-{
+// It took me a really long time to get this octree class working. I ended up in the end creating multiple different versions of it.
+// The reasons I kept retrying is because at first I couldn't get it to work properly. Then once I got it working, I had issues of the 
+//class being overcomplicated and therefore causing lag when running the project. At some point I got it working with smaller numbers of
+//objects but now with larger numbers. So I ended up re-doing it and trying to keep it very simple. This version not only is simple, but
+//no longer includes functions like, remove, and doesnt seperate itself into 2 classes of OctreeNode and OctreeRoot. 
 
+// I found this great article about octrees that helped me make this class: 
+//https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/introduction-to-octrees-r3529/
+
+// Here are other useful articles/websites and documents I found relating to octrees. Some are not c++ related:
+//https://www.piko3d.net/tutorials/space-partitioning-tutorial-piko3ds-dynamic-octree/
+//https://github.com/annell/octree-cpp
+//https://gameprogrammingpatterns.com/spatial-partition.html
+
+
+Octree::Octree(const Vec3& octreeCenter, const Vec3& octreeHalfSize, int depth)
+{
+    center = octreeCenter;
+    halfSize = octreeHalfSize;
 
     for (int i = 0; i < CHILDREN_COUNT; ++i)
     {
@@ -23,15 +39,18 @@ Octree::~Octree()
 
 void Octree::Insert(ColliderObject* collider)
 {
-    if (!IsInside(collider->position)) return;
+    if (IsInside(collider->position) == false)
+    {
+        return;
+    }
 
-    if (colliders.size() < MAX_OBJECTS || DEPTH <= 0)
+    if (DEPTH <= 0 || colliders.size() < MAX_OBJECTS )
     {
         colliders.push_back(collider);
     }
     else
     {
-        if (!children[0])
+        if (children[0] == nullptr)
         {
             Subdivide();
         }
@@ -42,9 +61,12 @@ void Octree::Insert(ColliderObject* collider)
     }
 }
 
-void Octree::Query(const ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
+void Octree::Retrieve(const ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
 {
-    if (!IsInside(collider->position)) return;
+    if (IsInside(collider->position) == false)
+    {
+        return;
+    }
 
     for (auto* obj : colliders)
     {
@@ -55,14 +77,31 @@ void Octree::Query(const ColliderObject* collider, std::list<ColliderObject*>& p
     {
         for (int i = 0; i < CHILDREN_COUNT; ++i)
         {
-            children[i]->Query(collider, possibleColliders);
+            children[i]->Retrieve(collider, possibleColliders);
         }
     }
 }
 
 bool Octree::IsInside(const Vec3& point) const
 {
-    return (point.x >= center.x - halfSize.x && point.x <= center.x + halfSize.x && point.y >= center.y - halfSize.y && point.y <= center.y + halfSize.y && point.z >= center.z - halfSize.z && point.z <= center.z + halfSize.z);
+    bool isInsideX = false;
+    bool isInsideY = false;
+    bool isInsideZ = false;
+
+    if (point.x >= center.x - halfSize.x && point.x <= center.x + halfSize.x)
+    {
+        isInsideX = true;
+    }
+    if (point.y >= center.y - halfSize.y && point.y <= center.y + halfSize.y)
+    {
+        isInsideY = true;
+    }
+    if (point.z >= center.z - halfSize.z && point.z <= center.z + halfSize.z)
+    {
+        isInsideZ = true;
+    }
+
+    return isInsideX && isInsideY && isInsideZ;
 }
 
 void Octree::Subdivide()
@@ -86,7 +125,8 @@ void Octree::Subdivide()
         {
             childCenter.y += halfChildSize.y;
         }
-        else {
+        else 
+        {
             childCenter.y -= halfChildSize.y;
         }
 

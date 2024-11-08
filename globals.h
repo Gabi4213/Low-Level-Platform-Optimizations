@@ -6,3 +6,6 @@
 
 // gravity - change it and see what happens (usually negative!)
 const float gravity = -19.81f;
+
+static int sphereBytesTotal = 1024;
+static int boxBytesTotal = 1024;

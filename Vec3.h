@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-class Vec3 {
+class Vec3 
+{
 public:
     float x, y, z;
 
@@ -14,26 +15,28 @@ public:
     {
         return Vec3(x - other.x, y - other.y, z - other.z);
     }
-
+    // overload the multiply operator
     Vec3 operator*(float scalar) const
     {
         return Vec3(x * scalar, y * scalar, z * scalar);
     }
-
+    // overload the addition operator
     Vec3 operator+(const Vec3& other) const
     {
         return Vec3(x + other.x, y + other.y, z + other.z);
     }
-
+    // overload the divide operator
     Vec3 operator/(float scalar) const
     {
         return Vec3(x / scalar, y / scalar, z / scalar);
     }
 
     // Normalize the vector
-    void normalise() {
+    void normalise()
+    {
         float length = std::sqrt(x * x + y * y + z * z);
-        if (length != 0) {
+        if (length != 0) 
+        {
             x /= length;
             y /= length;
             z /= length;
@@ -41,11 +44,13 @@ public:
     }
 
     // get the length of a vector
-    float length() const {
+    float length() const 
+    {
         return std::sqrt(x * x + y * y + z * z);
     }
 
-    float Distance(const Vec3& other) const {
+    float Distance(const Vec3& other) const 
+    {
         return std::sqrt(std::pow(x - other.x, 2) +
             std::pow(y - other.y, 2) +
             std::pow(z - other.z, 2));

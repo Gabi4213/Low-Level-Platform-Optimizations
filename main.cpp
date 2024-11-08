@@ -35,6 +35,8 @@ using namespace std::chrono;
 int numberOfBoxes = 50;
 int numberOfSpheres = 50;
 
+size_t boxTotalBytesAllocated = 1024;
+
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
 #define LOOKAT_X 10
@@ -55,10 +57,8 @@ Octree* octree;
 
 std::vector<std::thread> threads;
 
-void initScene(int boxCount, int sphereCount)
+void DestroyColliders()
 {
-    diagnosticsTracker = new DiagnosticsTracker();
-
     for (ColliderObject* obj : colliders)
     {
         if (Box* box = dynamic_cast<Box*>(obj))
@@ -70,12 +70,25 @@ void initScene(int boxCount, int sphereCount)
             Sphere::operator delete(obj, sizeof(Sphere));
         }
     }
-    colliders.clear();
 
+    colliders.clear();
+}
+
+void AllocateColliderBytes(size_t boxBytes, size_t sphereBytes)
+{
+    DestroyColliders();
+
+    Box::InitalizeMemoryPool(boxBytes);
+    Sphere::InitalizeMemoryPool(sphereBytes);
+}
+
+void initScene(int boxCount, int sphereCount)
+{
+    diagnosticsTracker = new DiagnosticsTracker();
 
     for (int i = 0; i < boxCount; ++i)
-    {
-        Box* box = new Box();
+    {            
+        Box* box = new Box;
 
         // Assign random x, y, and z positions within specified ranges
         box->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
@@ -96,7 +109,8 @@ void initScene(int boxCount, int sphereCount)
         colliders.push_back(box);
     }
 
-    for (int i = 0; i < sphereCount; ++i) {
+    for (int i = 0; i < sphereCount; ++i) 
+    {
         Sphere* sphere = new Sphere;
 
         // Assign random x, y, and z positions within specified ranges
@@ -120,7 +134,8 @@ void initScene(int boxCount, int sphereCount)
 }
 
 // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
-bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const ColliderObject* box) {
+bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const ColliderObject* box) 
+{
     float tMin = (box->position.x - box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
     float tMax = (box->position.x + box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
 
@@ -152,7 +167,8 @@ bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const C
 }
 
 // used in the 'mouse' tap function to convert a screen point to a point in the world
-Vec3 screenToWorld(int x, int y) {
+Vec3 screenToWorld(int x, int y) 
+{
     GLint viewport[4];
     GLdouble modelview[16];
     GLdouble projection[16];
@@ -177,7 +193,7 @@ void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
     for (ColliderObject* collider : colliders)
     {
         std::list<ColliderObject*> possibleColliders;
-        octree->Query(collider, possibleColliders);
+        octree->Retrieve(collider, possibleColliders);
 
         for (ColliderObject* other : possibleColliders)
         {
@@ -244,7 +260,8 @@ void updatePhysics(const float deltaTime)
 }
 
 // draw the sides of the containing area
-void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
+void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) 
+{
 
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
@@ -255,8 +272,8 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
 }
 
 // draw the entire scene
-void drawScene() {
-
+void drawScene() 
+{
     diagnosticsTracker->StartTimer("drawScene");
 
     // Draw the side wall
@@ -288,7 +305,8 @@ void drawScene() {
     Vec3 backWallV4(maxX, 0.0f, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
-    for (ColliderObject* box : colliders) {
+    for (ColliderObject* box : colliders)
+    {
         box->draw();
     }
 
@@ -324,7 +342,7 @@ void DrawImGui()
         std::string totalMemoryAllocation = "Total Memory Allocation: " + diagnosticsTracker->GetTotalMemoryAllocated();
         ImGui::Text(totalMemoryAllocation.c_str());
 
-        //function run time
+        //function run times
 
         //physics
         std::string updatePhysicsRunTime = "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics");
@@ -358,37 +376,40 @@ void DrawImGui()
 
         if (ImGui::Button("Initialize Scene"))
         {
-            initScene(numberOfBoxes, numberOfSpheres);
-        }
+            AllocateColliderBytes(1024, 1024);
 
-        if (ImGui::Button("Set 50"))
-        {
-            numberOfBoxes = 50;
-            numberOfSpheres = 50;
             initScene(numberOfBoxes, numberOfSpheres);
         }
-        ImGui::SameLine();
 
         if (ImGui::Button("Set 100"))
         {
-            numberOfBoxes = 100;
-            numberOfSpheres = 100;
+            numberOfBoxes = 50;
+            numberOfSpheres = 50;
+
+            AllocateColliderBytes(1024, 1024);
+
             initScene(numberOfBoxes, numberOfSpheres);
         }
         ImGui::SameLine();
 
         if (ImGui::Button("Set 1000"))
         {
-            numberOfBoxes = 1000;
-            numberOfSpheres = 1000;
+            numberOfBoxes = 500;
+            numberOfSpheres = 500;
+
+            AllocateColliderBytes(1024, 1024);
+
             initScene(numberOfBoxes, numberOfSpheres);
         }
         ImGui::SameLine();
 
-        if (ImGui::Button("Set 5000"))
+        if (ImGui::Button("Set 10000"))
         {
             numberOfBoxes = 5000;
             numberOfSpheres = 5000;
+
+            AllocateColliderBytes(5000, 5000);
+
             initScene(numberOfBoxes, numberOfSpheres);
         }
     }
@@ -427,7 +448,8 @@ void display()
 // called by GLUT when the cpu is idle - has a timer function you can use for FPS, and updates the physics
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
-void idle() {
+void idle()
+{
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
@@ -441,8 +463,10 @@ void idle() {
 }
 
 // called the mouse button is tapped
-void mouse(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+void mouse(int button, int state, int x, int y) 
+{
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
+    {
         // Get the camera position and direction
         Vec3 cameraPosition(LOOKAT_X, LOOKAT_Y, LOOKAT_Z); // Replace with your actual camera position
         Vec3 cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
@@ -458,14 +482,17 @@ void mouse(int button, int state, int x, int y) {
         bool clickedBoxOK = false;
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
-        for (ColliderObject* box : colliders) {
-            if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
+        for (ColliderObject* box : colliders) 
+        {
+            if (rayBoxIntersection(cameraPosition, rayDirection, box))
+            {
                 // Calculate the distance between the camera and the intersected box
                 Vec3 diff = box->position - cameraPosition;
                 float distance = diff.length();
 
                 // Update the clicked box index if this box is closer to the camera
-                if (distance < minIntersectionDistance) {
+                if (distance < minIntersectionDistance) 
+                {
                     clickedBoxOK = true;
                     minIntersectionDistance = distance;
                 }
@@ -473,7 +500,8 @@ void mouse(int button, int state, int x, int y) {
         }
 
         // Remove the clicked box if any
-        if (clickedBoxOK != false) {
+        if (clickedBoxOK != false) 
+        {
             // TODO
             //colliders.erase(colliders.begin() + clickedBoxIndex);
         }
@@ -481,22 +509,26 @@ void mouse(int button, int state, int x, int y) {
 }
 
 // called when the keyboard is used
-void keyboard(unsigned char key, int x, int y) {
+void keyboard(unsigned char key, int x, int y) 
+{
     const float impulseMagnitude = 20.0f; // Upward impulse magnitude
 
-    if (key == ' ') { // Spacebar key
-        for (ColliderObject* box : colliders) {
+    if (key == ' ')
+    { 
+        for (ColliderObject* box : colliders) 
+        {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '1') { // 1
-
+    else if (key == '1')
+    { 
         std::cout << "Memory used" << std::endl;
     }
 }
 
 // the main function. 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
@@ -525,7 +557,10 @@ int main(int argc, char** argv) {
     // Setup style
     ImGui::StyleColorsDark();
 
+    AllocateColliderBytes(1024,1024);
+
     initScene(numberOfBoxes, numberOfSpheres);
+
     glutIdleFunc(idle);
 
     // it will stick here until the program ends. 

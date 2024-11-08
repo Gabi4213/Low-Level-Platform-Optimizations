@@ -2,13 +2,15 @@
 
 #include "ColliderObject.h"
 #include "MemoryPool.h"
+#include "globals.h"
 
 class Box : public ColliderObject
 {
 private:
-
 	static MemoryPool* boxMemoryPool;
 public:
+
+	static void InitalizeMemoryPool(size_t totalBytesAllocated);
 
     static void* operator new(size_t size);
     static void operator delete(void* poolMemory, size_t size);

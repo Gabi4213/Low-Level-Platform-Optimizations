@@ -95,15 +95,6 @@ public:
         if (position.z - size.z / 2.0f < minZ || position.z + size.z / 2.0f > maxZ) {
             velocity.z = -velocity.z;
         }
-
-        //// Check for collisions with other colliders
-        //for (ColliderObject* other : *colliders) {
-        //    if (this == other) continue;
-        //    if (checkCollision(this, other)) {
-        //        resolveCollision(this, other);
-        //        break;
-        //    }
-        //}
     }
 };
 

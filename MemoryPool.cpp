@@ -2,8 +2,10 @@
 #include <stdexcept>
 #include <iostream>
 
-MemoryPool::MemoryPool(size_t totalSize, size_t blocksSize): poolSize(totalSize), blocksSize(blocksSize)
+MemoryPool::MemoryPool(size_t totalSize, size_t blockSize)
 {
+    poolSize = totalSize;
+    blocksSize = blockSize;
     memoryPool = operator new(poolSize);
 }
 
@@ -14,12 +16,12 @@ MemoryPool::~MemoryPool()
 
 void* MemoryPool::AllocateMemory(size_t size)
 {
-    if (size > blocksSize) 
+    if (size > blocksSize)
     {
         throw std::runtime_error("Requested size is larger than block size");
     }
 
-    if (!freeList.empty()) 
+    if (freeList.empty() == false) 
     {
         void* memory = freeList.back();
         freeList.pop_back();

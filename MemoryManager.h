@@ -6,7 +6,6 @@ extern size_t totalAllocatedMemory;
 void* operator new (size_t size);
 void operator delete (void* poolMemory);
 
-
 struct MemoryAllocation
 {
 	size_t bytesAllocated;
