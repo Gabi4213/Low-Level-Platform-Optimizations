@@ -10,6 +10,7 @@
 #include <vector>
 #include <deque>
 #include <unordered_map>
+#include <thread>
 
 #include "Box.h"
 #include "Sphere.h"
@@ -63,7 +64,6 @@ public:
 	std::string GetCPUUsage();
 	std::string GetFrameTime();
 	std::string GetFPS();
-	std::string GetThreadCount();
 	std::string GetFunctionRunTime(const std::string& functionName);
 	std::string GetTotalMemoryAllocated();
 };

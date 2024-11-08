@@ -1,13 +1,22 @@
-﻿  DiagnosticsTracker.cpp
+﻿  Box.cpp
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(146,64): warning C4129: 'C': unrecognized character escape sequence
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(157,66): warning C4129: 'C': unrecognized character escape sequence
+  ColliderObject.cpp
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  DiagnosticsTracker.cpp
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(140,64): warning C4129: 'C': unrecognized character escape sequence
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(151,66): warning C4129: 'C': unrecognized character escape sequence
+  Octree.cpp
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Octree.cpp(47,46): warning C4018: '<': signed/unsigned mismatch
+  Sphere.cpp
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
   main.cpp
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
   Generating code
-  2 of 1757 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  4 of 1755 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    23 functions had inline decision re-evaluated but remain unchanged
+    32 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Physio.vcxproj -> C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\Physio.exe
   0 File(s) copied

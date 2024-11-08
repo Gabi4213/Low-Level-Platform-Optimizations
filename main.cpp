@@ -38,6 +38,8 @@ int octreeMaxObjects = 4;
 
 int memoryAllocatedSize = 10;
 
+int maxThreads = 4;
+
 size_t boxTotalBytesAllocated = 1024;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
@@ -49,8 +51,6 @@ size_t boxTotalBytesAllocated = 1024;
 #define LOOKDIR_X 10
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
-
-#define MAX_THREADS 4
 
 std::list<ColliderObject*> colliders;
 
@@ -226,11 +226,11 @@ void updatePhysics(const float deltaTime)
         octree->Insert(collider);
     }
 
-    int colldidersPerThreads = colliders.size() / MAX_THREADS;
+    int colldidersPerThreads = colliders.size() / maxThreads;
     auto itterator = colliders.begin();
     std::mutex mutex;
 
-    for (int i = 0; i < MAX_THREADS; i++)
+    for (int i = 0; i < maxThreads; i++)
     {
         std::list<ColliderObject*> chunks;
 
@@ -338,7 +338,7 @@ void DrawImGui()
         ImGui::Text(fps.c_str());
 
         //Thread Count
-        std::string threadCount = "Thread Count: " + diagnosticsTracker->GetThreadCount();
+        std::string threadCount = "Thread Count: " + std::to_string(maxThreads);;
         ImGui::Text(threadCount.c_str());
 
         //Total Memory Allocation
@@ -400,7 +400,6 @@ void DrawImGui()
             diagnosticsTracker->DeallocateMemory();
         }
     }
-
     if (ImGui::CollapsingHeader("Objects"))
     {
         ImGui::SliderInt("Number of Cubes", &numberOfBoxes, 100, 1000);
@@ -511,6 +510,10 @@ void DrawImGui()
 
             colliders.push_back(sphere);
         }
+    }
+    if (ImGui::CollapsingHeader("Threads"))
+    {
+        ImGui::SliderInt("Number of Threads", &maxThreads, 1, 20);
     }
     if (ImGui::CollapsingHeader("Octree"))
     {

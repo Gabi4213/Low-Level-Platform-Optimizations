@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #define minX -10.0f
 #define maxX 30.0f
 #define minZ -30.0f
