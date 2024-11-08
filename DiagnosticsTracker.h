@@ -11,6 +11,9 @@
 #include <deque>
 #include <unordered_map>
 
+#include "Box.h"
+#include "Sphere.h"
+
 using namespace std::chrono;
 
 class DiagnosticsTracker
@@ -44,7 +47,11 @@ public:
 	void StopTimer(const std::string& functionName);
 
 	void WalkTheHeap();
+
 	void OutputMemoryAllocation();
+	void OutputBoxMemoryAllocation();
+	void OutputSphereMemoryAllocation();
+
 	void TriggerBufferOverflow();
 
 	std::string GetMemoryUsage();

@@ -15,6 +15,8 @@ public:
     static void* operator new(size_t size);
     static void operator delete(void* poolMemory, size_t size);
 
+    static MemoryPool* GetMemoryPool();
+
     void drawMesh() { glutSolidSphere(0.5, 5, 5); }
 }; 
 

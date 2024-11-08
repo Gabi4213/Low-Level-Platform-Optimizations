@@ -28,3 +28,8 @@ void Box::operator delete(void* poolMemory, size_t size)
         boxMemoryPool->DeallocateMemory(poolMemory);
     }
 }
+
+MemoryPool* Box::GetMemoryPool()
+{
+    return boxMemoryPool;
+}

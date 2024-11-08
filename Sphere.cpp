@@ -28,3 +28,8 @@ void Sphere::operator delete(void* poolMemory, size_t size)
         sphereMemoryPool->DeallocateMemory(poolMemory);
     }
 }
+
+MemoryPool* Sphere::GetMemoryPool()
+{
+    return sphereMemoryPool;
+}

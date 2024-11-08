@@ -49,3 +49,13 @@ void MemoryPool::DeallocateMemory(void* poolMemory)
         throw std::runtime_error("Pointer out of memory pool range");
     }
 }
+
+size_t MemoryPool::GetPoolSize()
+{
+    return poolSize;
+}
+
+size_t MemoryPool::GetBlocksSize()
+{
+    return blocksSize;
+}

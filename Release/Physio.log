@@ -1,12 +1,13 @@
-﻿  Octree.cpp
+﻿  DiagnosticsTracker.cpp
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Octree.cpp(47,46): warning C4018: '<': signed/unsigned mismatch
+  Sphere.cpp
+C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
   main.cpp
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
   Generating code
-  7 of 1739 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    12 functions had inline decision re-evaluated but remain unchanged
+  4 of 1745 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    2 functions were new in current compilation
+    21 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Physio.vcxproj -> C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\Physio.exe
   0 File(s) copied

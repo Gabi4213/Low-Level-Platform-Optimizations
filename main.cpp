@@ -22,8 +22,6 @@
 #include "globals.h"
 #include "Vec3.h"
 #include "ColliderObject.h"
-#include "Box.h"
-#include "Sphere.h"
 #include "DiagnosticsTracker.h"
 #include "MemoryPool.h"
 #include "Octree.h"
@@ -369,6 +367,16 @@ void DrawImGui()
         if (ImGui::Button("Output Memory Allocation"))
         {
             diagnosticsTracker->OutputMemoryAllocation();
+        }
+
+        if (ImGui::Button("Output Box Memory Data"))
+        {
+            diagnosticsTracker->OutputBoxMemoryAllocation();
+        }
+
+        if (ImGui::Button("Output Sphere Memory Data"))
+        {
+            diagnosticsTracker->OutputSphereMemoryAllocation();
         }
 
         if (ImGui::Button("Trigger Buffer Overflow"))
