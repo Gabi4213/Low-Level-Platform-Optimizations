@@ -14,7 +14,8 @@ public:
     Vec3 colour;
 
     // if two colliders collide, push them away from each other
-    void resolveCollision(ColliderObject* a, ColliderObject* b) {
+    void resolveCollision(ColliderObject* a, ColliderObject* b) 
+    {
         Vec3 normal = { a->position.x - b->position.x, a->position.y - b->position.y, a->position.z - b->position.z };
         float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
 
@@ -29,7 +30,8 @@ public:
         float impulse = relativeVelocityX * normal.x + relativeVelocityY * normal.y + relativeVelocityZ * normal.z;
 
         // Ignore collision if objects are moving away from each other
-        if (impulse > 0) {
+        if (impulse > 0) 
+        {
             return;
         }
 
@@ -48,14 +50,16 @@ public:
     }
 
     // are two colliders colliding?
-    bool checkCollision(const ColliderObject* a, const ColliderObject* b) {
+    bool checkCollision(const ColliderObject* a, const ColliderObject* b) 
+    {
         return (std::abs(a->position.x - b->position.x) * 2 < (a->size.x + b->size.x)) &&
             (std::abs(a->position.y - b->position.y) * 2 < (a->size.y + b->size.y)) &&
             (std::abs(a->position.z - b->position.z) * 2 < (a->size.z + b->size.z));
     }
 
     // draw the physics object
-    void draw() {
+    void draw() 
+    {
         glPushMatrix();
         glTranslatef(position.x, position.y, position.z);
         GLfloat diffuseMaterial[] = { colour.x, colour.y, colour.z, 1.0f };
@@ -82,17 +86,20 @@ public:
         position.z += velocity.z * deltaTime;
 
         // Check for collision with the floor
-        if (position.y - size.y / 2.0f < floorY) {
+        if (position.y - size.y / 2.0f < floorY) 
+        {
             position.y = floorY + size.y / 2.0f;
             float dampening = 0.7f;
             velocity.y = -velocity.y * dampening;
         }
 
         // Check for collision with the walls
-        if (position.x - size.x / 2.0f < minX || position.x + size.x / 2.0f > maxX) {
+        if (position.x - size.x / 2.0f < minX || position.x + size.x / 2.0f > maxX) 
+        {
             velocity.x = -velocity.x;
         }
-        if (position.z - size.z / 2.0f < minZ || position.z + size.z / 2.0f > maxZ) {
+        if (position.z - size.z / 2.0f < minZ || position.z + size.z / 2.0f > maxZ) 
+        {
             velocity.z = -velocity.z;
         }
     }

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <mutex>
 
-const unsigned int GUARD_VALUE = 0xDEADBEEF;
+const unsigned int CHECK_VALUE = 0xDEADBEEF;
 size_t totalAllocatedMemory = 0;
 
 Header* firstAllocation{ nullptr };
@@ -32,7 +32,7 @@ void* operator new (size_t size)
 
 	Header* headerPtr = (Header*)poolMemory;
 	headerPtr->size = size;
-	headerPtr->guardValue = GUARD_VALUE;
+	headerPtr->checkValue = CHECK_VALUE;
 	headerPtr->previousHeader = lastAllocation;
 	headerPtr->nextHeader = nullptr;
 
@@ -49,7 +49,7 @@ void* operator new (size_t size)
 	}
 
 	Footer* footerPtr = (Footer*)(poolMemory + sizeof(Header) + size);
-	footerPtr->guardValue = GUARD_VALUE;
+	footerPtr->checkValue = CHECK_VALUE;
 
 	totalAllocatedMemory += size;
 
@@ -90,15 +90,15 @@ void operator delete (void* poolMemory)
 		headerPtr->nextHeader->previousHeader = headerPtr->previousHeader;
 	}
 
-	if (headerPtr->guardValue != GUARD_VALUE)
+	if (headerPtr->checkValue != CHECK_VALUE)
 	{
-		std::cout << "header guard value doesnt match!" << std::endl;
+		std::cout << "header check value doesnt match! Buffer Overflow!" << std::endl;
 		return;
 	}
 
-	if (footerPtr->guardValue != GUARD_VALUE)
+	if (footerPtr->checkValue != CHECK_VALUE)
 	{
-		std::cout << "footer guard value doesnt match!" << std::endl;
+		std::cout << "footer check value doesnt match! Buffer Overflow!" << std::endl;
 		return;
 	}
 

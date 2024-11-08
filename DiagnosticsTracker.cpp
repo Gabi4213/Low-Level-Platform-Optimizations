@@ -143,9 +143,9 @@ void DiagnosticsTracker::WalkTheHeap()
     {
         Footer* currentFooter = (Footer*)((char*)currentHeader + sizeof(Header) + currentHeader->size);
 
-        std::cout << "Current Header at: " << currentHeader << "\n\tGuard Value: " << currentHeader->guardValue << "\n\tPrevious Header: " << currentHeader->previousHeader << "\n\tNext Header: " << currentHeader->nextHeader;
+        std::cout << "Current Header at: " << currentHeader << "\n\tGuard Value: " << currentHeader->checkValue << "\n\tPrevious Header: " << currentHeader->previousHeader << "\n\tNext Header: " << currentHeader->nextHeader;
 
-        std::cout << "\nCurrent Footer at: " << currentFooter << "\n\tGuard Value: " << currentFooter->guardValue << "\n\tSize: " << currentHeader->size << "\n\n";
+        std::cout << "\nCurrent Footer at: " << currentFooter << "\n\tGuard Value: " << currentFooter->checkValue << "\n\tSize: " << currentHeader->size << "\n\n";
 
         currentHeader = currentHeader->nextHeader;
     }
@@ -154,4 +154,16 @@ void DiagnosticsTracker::WalkTheHeap()
 void DiagnosticsTracker::OutputMemoryAllocation()
 {
     std::cout << "\nBytes Allocated: " << memoryAllocation.bytesAllocated << "\nBytes Deallocated: " << memoryAllocation.bytesDeallocated << "\nBytes: " << memoryAllocation.bytes << "\n\n";
+}
+
+void DiagnosticsTracker::TriggerBufferOverflow()
+{
+    int* intArray = new int[10];
+
+    for (int i = 0; i < 15; i++) 
+    {
+        intArray[i] = i;
+    }
+
+    delete[] intArray;
 }

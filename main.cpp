@@ -55,7 +55,7 @@ DiagnosticsTracker* diagnosticsTracker;
 
 Octree* octree;
 
-std::vector<std::thread> threads;
+std::list<std::thread> threads;
 
 void DestroyColliders()
 {
@@ -247,7 +247,6 @@ void updatePhysics(const float deltaTime)
         collider->update(deltaTime);
     }
 
-
     for (auto& thread : threads)
     {
         thread.join();
@@ -366,6 +365,11 @@ void DrawImGui()
         if (ImGui::Button("Output Memory Allocation"))
         {
             diagnosticsTracker->OutputMemoryAllocation();
+        }
+
+        if (ImGui::Button("Trigger Buffer Overflow"))
+        {
+            diagnosticsTracker->TriggerBufferOverflow();
         }
     }
 
@@ -529,7 +533,6 @@ void keyboard(unsigned char key, int x, int y)
 // the main function. 
 int main(int argc, char** argv)
 {
-
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);

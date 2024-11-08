@@ -1,6 +1,6 @@
 #pragma once
 
-extern const unsigned int GUARD_VALUE;
+extern const unsigned int CHECK_VALUE;
 extern size_t totalAllocatedMemory;
 
 void* operator new (size_t size);
@@ -25,12 +25,12 @@ struct Header
 	size_t size;
 	Header* nextHeader;
 	Header* previousHeader;
-	unsigned int guardValue;
+	unsigned int checkValue;
 };
 
 struct Footer
 {
-	unsigned int guardValue;
+	unsigned int checkValue;
 };
 
 extern Header* firstAllocation;

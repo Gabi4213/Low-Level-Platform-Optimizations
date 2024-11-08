@@ -45,6 +45,7 @@ public:
 
 	void WalkTheHeap();
 	void OutputMemoryAllocation();
+	void TriggerBufferOverflow();
 
 	std::string GetMemoryUsage();
 	std::string GetCPUUsage();
