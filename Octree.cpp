@@ -44,7 +44,7 @@ void Octree::Insert(ColliderObject* collider)
         return;
     }
 
-    if (DEPTH <= 0 || colliders.size() < MAX_OBJECTS )
+    if (octreeDepth <= 0 || colliders.size() < octreeMaxObjects)
     {
         colliders.push_back(collider);
     }
@@ -139,6 +139,12 @@ void Octree::Subdivide()
             childCenter.z -= halfChildSize.z;
         }
 
-        children[childIndex] = new Octree(childCenter, halfChildSize, DEPTH - 1);
+        children[childIndex] = new Octree(childCenter, halfChildSize, octreeDepth - 1);
     }
+}
+
+void Octree::SetOctreeVariables(int depth, int maxObjects)
+{
+    octreeDepth = depth;
+    octreeMaxObjects = maxObjects;
 }

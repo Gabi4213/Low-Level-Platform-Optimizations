@@ -6,7 +6,7 @@
 #include "Vec3.h"
 
 #define DEPTH 5
-#define MAX_OBJECTS 4
+#define MAX_OBJECTS 4 
 #define CHILDREN_COUNT 8
 
 class Octree
@@ -14,6 +14,9 @@ class Octree
 private:
     bool IsInside(const Vec3& point) const;
     void Subdivide();
+
+    int octreeDepth;
+    int octreeMaxObjects;
 
 public:
     Vec3 center;
@@ -27,4 +30,6 @@ public:
 
     void Insert(ColliderObject* collider);
     void Retrieve(const ColliderObject* collider, std::list<ColliderObject*>& possibleColliders);
+
+    void SetOctreeVariables(int depth, int maxObjects);
 };

@@ -35,6 +35,9 @@ using namespace std::chrono;
 int numberOfBoxes = 50;
 int numberOfSpheres = 50;
 
+int octreeDepth = 5;
+int octreeMaxObjects = 4;
+
 size_t boxTotalBytesAllocated = 1024;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
@@ -216,6 +219,7 @@ void updatePhysics(const float deltaTime)
     diagnosticsTracker->StartTimer("updatePhysics");
 
     octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
+    octree->SetOctreeVariables(octreeDepth, octreeMaxObjects);
 
     for (ColliderObject* collider : colliders)
     {
@@ -417,6 +421,12 @@ void DrawImGui()
             initScene(numberOfBoxes, numberOfSpheres);
         }
     }
+    if (ImGui::CollapsingHeader("Octree"))
+    {
+        ImGui::SliderInt("Depth", &octreeDepth, 1, 30);
+        ImGui::SliderInt("Max Objects", &octreeMaxObjects, 1, 30);
+    }
+
     ImGui::End();
 }
 
