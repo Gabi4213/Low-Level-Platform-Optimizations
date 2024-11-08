@@ -50,12 +50,7 @@ void MemoryPool::DeallocateMemory(void* poolMemory)
     }
 }
 
-size_t MemoryPool::GetPoolSize()
+size_t MemoryPool::GetCurrentMemoryAllocated()
 {
-    return poolSize;
-}
-
-size_t MemoryPool::GetBlocksSize()
-{
-    return blocksSize;
+    return poolOffset - (freeList.size() * blocksSize);
 }

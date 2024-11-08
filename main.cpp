@@ -444,6 +444,73 @@ void DrawImGui()
 
             initScene(numberOfBoxes, numberOfSpheres);
         }
+        if (ImGui::Button("Delete Object 1 by 1"))
+        {
+            if (colliders.size() > 0)
+            {
+                if (Box* box = dynamic_cast<Box*>(colliders.front()))
+                {
+                    Box::operator delete(colliders.front(), sizeof(Box));
+                    colliders.remove(colliders.front());
+                }
+                else if (Sphere* sphere = dynamic_cast<Sphere*>(colliders.front()))
+                {
+                    Sphere::operator delete(colliders.front(), sizeof(Sphere));
+                    colliders.remove(colliders.front());
+                }
+            }
+        }
+        if (ImGui::Button("Delete All Objects"))
+        {
+            DestroyColliders();
+        }
+        if (ImGui::Button("Add Box"))
+        {
+            Box* box = new Box();
+
+            // Assign random x, y, and z positions within specified ranges
+            box->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+            box->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+            box->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+            box->size = { 1.0f, 1.0f, 1.0f };
+
+            // Assign random x-velocity between -1.0f and 1.0f
+            float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
+            box->velocity = { randomXVelocity, 0.0f, 0.0f };
+
+            // Assign a random color to the box
+            box->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            box->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            box->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+            colliders.push_back(box);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Add Sphere"))
+        {
+            Sphere* sphere = new Sphere;
+
+            // Assign random x, y, and z positions within specified ranges
+            sphere->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+            sphere->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+            sphere->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+            sphere->size = { 1.0f, 1.0f, 1.0f };
+
+            // Assign random x-velocity between -1.0f and 1.0f
+            float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
+            sphere->velocity = { randomXVelocity, 0.0f, 0.0f };
+
+            // Assign a random color to the box
+            sphere->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            sphere->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            sphere->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+            colliders.push_back(sphere);
+        }
     }
     if (ImGui::CollapsingHeader("Octree"))
     {

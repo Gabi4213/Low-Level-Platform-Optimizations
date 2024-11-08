@@ -157,13 +157,13 @@ void DiagnosticsTracker::OutputMemoryAllocation()
 }
 
 void DiagnosticsTracker::OutputBoxMemoryAllocation()
-{
-    std::cout << "\nBox:" << "\nAddress: " << Box::GetMemoryPool() << "\nPool Size: " << Box::GetMemoryPool()->GetPoolSize() <<  "\nBlocks Size: " << Box::GetMemoryPool()->GetBlocksSize() << std::endl;
+{    
+    std::cout << "Current Boxes Memory Allocated: " << Box::GetMemoryPool()->GetCurrentMemoryAllocated() << " Bytes\n";
 }
 
 void DiagnosticsTracker::OutputSphereMemoryAllocation()
 {
-    std::cout << "\nSphere:" << "\nAddress: " << Sphere::GetMemoryPool() << "\nPool Size: " << Sphere::GetMemoryPool()->GetPoolSize() << "\nBlocks Size: " << Sphere::GetMemoryPool()->GetBlocksSize() << std::endl;
+    std::cout << "Current Spheres Memory Allocated: " << Sphere::GetMemoryPool()->GetCurrentMemoryAllocated() << " Bytes\n";
 }
 
 void DiagnosticsTracker::TriggerBufferOverflow()

@@ -1,6 +1,7 @@
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\vc143.pdb
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\vec3.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\sphere.obj
+c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\memorypool.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\main.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\imgui_impl_opengl2.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\imgui_impl_freeglut.obj
@@ -10,7 +11,8 @@ c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\relea
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\diagnosticstracker.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\colliderobject.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\box.obj
-c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\memorypool.obj
+c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\memorymanager.obj
+c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\octree.obj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\physio.ipdb
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\physio.iobj
 c:\users\offic\desktop\university\low-level platform optimisation\git\llpo\release\physio.exe

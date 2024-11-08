@@ -21,6 +21,5 @@ public:
     void* AllocateMemory(size_t size);
     void DeallocateMemory(void* poolMemory);
 
-    size_t GetPoolSize();
-    size_t GetBlocksSize();
+    size_t GetCurrentMemoryAllocated();
 };
