@@ -143,9 +143,18 @@ void DiagnosticsTracker::WalkTheHeap()
     {
         Footer* currentFooter = (Footer*)((char*)currentHeader + sizeof(Header) + currentHeader->size);
 
-        std::cout << "Current Header at: " << currentHeader << "\n\tGuard Value: " << currentHeader->checkValue << "\n\tPrevious Header: " << currentHeader->previousHeader << "\n\tNext Header: " << currentHeader->nextHeader;
+        std::cout << "Current Header at: " << currentHeader << "\n\Check Value: " << currentHeader->checkValue << "\n\tPrevious Header: " << currentHeader->previousHeader << "\n\tNext Header: " << currentHeader->nextHeader;
 
-        std::cout << "\nCurrent Footer at: " << currentFooter << "\n\tGuard Value: " << currentFooter->checkValue << "\n\tSize: " << currentHeader->size << "\n\n";
+        if (currentHeader->checkValue == currentFooter->checkValue)
+        {
+            std::cout << "\n\tNOT Corrupt" << std::endl;
+        }
+        else
+        {
+            std::cout << "\n\tCorrupt" << std::endl;
+        }
+
+        std::cout << "\nCurrent Footer at: " << currentFooter << "\n\Check Value: " << currentFooter->checkValue << "\n\tSize: " << currentHeader->size << "\n\n";
 
         currentHeader = currentHeader->nextHeader;
     }
