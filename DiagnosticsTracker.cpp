@@ -105,12 +105,12 @@ std::string DiagnosticsTracker::GetTotalMemoryAllocated()
 }
 
 
-void DiagnosticsTracker::StartTimer(const std::string& functionName)
+void DiagnosticsTracker::StartTimer(std::string& functionName)
 {
     startTimes[functionName] = high_resolution_clock::now();
 }
 
-void DiagnosticsTracker::StopTimer(const std::string& functionName)
+void DiagnosticsTracker::StopTimer(std::string& functionName)
 {
     auto stopTime = high_resolution_clock::now();
 
@@ -119,7 +119,7 @@ void DiagnosticsTracker::StopTimer(const std::string& functionName)
     functionDurations[functionName] = duration;
 }
 
-std::string DiagnosticsTracker::GetFunctionRunTime(const std::string& functionName)
+std::string DiagnosticsTracker::GetFunctionRunTime(std::string& functionName)
 {
     return std::to_string(functionDurations[functionName].count());
 }

@@ -46,8 +46,8 @@ public:
 
 	DiagnosticsTracker();
 
-	void StartTimer(const std::string& functionName);
-	void StopTimer(const std::string& functionName);
+	void StartTimer(std::string& functionName);
+	void StopTimer(std::string& functionName);
 
 	void WalkTheHeap();
 
@@ -64,7 +64,7 @@ public:
 	std::string GetCPUUsage();
 	std::string GetFrameTime();
 	std::string GetFPS();
-	std::string GetFunctionRunTime(const std::string& functionName);
+	std::string GetFunctionRunTime(std::string& functionName);
 	std::string GetTotalMemoryAllocated();
 };
 

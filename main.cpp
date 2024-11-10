@@ -193,7 +193,7 @@ Vec3 screenToWorld(int x, int y)
 
 void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
 {
-    for (ColliderObject* collider : colliders)
+    for (ColliderObject* collider : colliderList)
     {
         std::list<ColliderObject*> possibleColliders;
         octree->Retrieve(collider, possibleColliders);
@@ -202,10 +202,9 @@ void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
         {
             if (collider != other)
             {
-                std::lock_guard<std::mutex> lock(mutex);
-
                 if (collider->checkCollision(collider, other))
                 {
+                    std::lock_guard<std::mutex> lock(mutex);
                     collider->resolveCollision(collider, other);
                 }
             }
@@ -216,9 +215,13 @@ void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime)
 {
-    diagnosticsTracker->StartTimer("updatePhysics");
+    std::string functionName = "updatePhysics";
+    diagnosticsTracker->StartTimer(functionName);
 
-    octree = new Octree(Vec3(0.0f, 0.0f, 0.0f), Vec3(100.0f, 100.0f, 100.0f));
+    Vec3 octreeCenter = Vec3(0.0f, 0.0f, 0.0f);
+    Vec3 octreeHalfSize = Vec3(100.0f, 100.0f, 100.0f);
+
+    octree = new Octree(octreeCenter, octreeHalfSize);
     octree->SetOctreeVariables(octreeDepth, octreeMaxObjects);
 
     for (ColliderObject* collider : colliders)
@@ -259,7 +262,7 @@ void updatePhysics(const float deltaTime)
     threads.clear();
     delete octree;
 
-    diagnosticsTracker->StopTimer("updatePhysics");
+    diagnosticsTracker->StopTimer(functionName);
 }
 
 // draw the sides of the containing area
@@ -277,7 +280,8 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4)
 // draw the entire scene
 void drawScene() 
 {
-    diagnosticsTracker->StartTimer("drawScene");
+    std::string functionName = "drawScene";
+    diagnosticsTracker->StartTimer(functionName);
 
     // Draw the side wall
     GLfloat diffuseMaterial[] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -313,7 +317,7 @@ void drawScene()
         box->draw();
     }
 
-    diagnosticsTracker->StopTimer("drawScene");
+    diagnosticsTracker->StopTimer(functionName);
 }
 
 void DrawImGui()
@@ -348,17 +352,19 @@ void DrawImGui()
         //function run times
 
         //physics
-        std::string updatePhysicsRunTime = "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics");
+        std::string updatePhysicsfunctionName = "updatePhysics";
+        std::string updatePhysicsRunTime = "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(updatePhysicsfunctionName);
         ImGui::Text(updatePhysicsRunTime.c_str());
 
         //draw
-        std::string drawSceneRunTime = "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene");
+        std::string drawScenefunctionName = "drawScene";
+        std::string drawSceneRunTime = "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(drawScenefunctionName);
         ImGui::Text(drawSceneRunTime.c_str());
 
         if (ImGui::Button("Print Function Execution Times"))
         {
-            std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("drawScene") << std::endl;
-            std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime("updatePhysics") << std::endl;
+            std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(drawScenefunctionName) << std::endl;
+            std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(updatePhysicsfunctionName) << std::endl;
         }
     }
     if (ImGui::CollapsingHeader("Memory Management"))
@@ -436,8 +442,8 @@ void DrawImGui()
 
         if (ImGui::Button("Set 10000"))
         {
-            numberOfBoxes = 5000;
-            numberOfSpheres = 5000;
+            numberOfBoxes = 2500;
+            numberOfSpheres = 2500;
 
             AllocateColliderBytes(5000, 5000);
 

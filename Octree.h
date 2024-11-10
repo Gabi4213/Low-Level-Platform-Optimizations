@@ -5,31 +5,30 @@
 #include "ColliderObject.h"
 #include "Vec3.h"
 
-#define DEPTH 5
-#define MAX_OBJECTS 4 
 #define CHILDREN_COUNT 8
 
 class Octree
 {
-private:
-    bool IsInside(const Vec3& point) const;
-    void Subdivide();
-
-    int octreeDepth;
-    int octreeMaxObjects;
-
 public:
     Vec3 center;
-    Vec3 halfSize; 
+    Vec3 halfSize;
 
     Octree* children[CHILDREN_COUNT];
     std::list<ColliderObject*> colliders;
 
-    Octree(const Vec3& octreeCenter, const Vec3& octreeHalfSize, int depth = 0);
+    Octree(Vec3& octreeCenter, Vec3& octreeHalfSize, int depth = 0);
     ~Octree();
 
     void Insert(ColliderObject* collider);
-    void Retrieve(const ColliderObject* collider, std::list<ColliderObject*>& possibleColliders);
+    void Retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders);
 
     void SetOctreeVariables(int depth, int maxObjects);
+
+private:
+
+    int octreeDepth;
+    int octreeMaxObjects;
+
+    bool Contains(Vec3& point);
+    void Subdivide();
 };

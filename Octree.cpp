@@ -14,13 +14,15 @@
 //https://github.com/annell/octree-cpp
 //https://gameprogrammingpatterns.com/spatial-partition.html
 
-
-Octree::Octree(const Vec3& octreeCenter, const Vec3& octreeHalfSize, int depth)
+Octree::Octree(Vec3& octreeCenter, Vec3& octreeHalfSize, int depth)
 {
     center = octreeCenter;
     halfSize = octreeHalfSize;
 
-    for (int i = 0; i < CHILDREN_COUNT; ++i)
+    octreeMaxObjects = 4;
+    octreeDepth = 8;
+
+    for (int i = 0; i < CHILDREN_COUNT; i++)
     {
         children[i] = nullptr;
     }
@@ -28,7 +30,7 @@ Octree::Octree(const Vec3& octreeCenter, const Vec3& octreeHalfSize, int depth)
 
 Octree::~Octree()
 {
-    for (int i = 0; i < CHILDREN_COUNT; ++i)
+    for (int i = 0; i < CHILDREN_COUNT; i++)
     {
         if (children[i])
         {
@@ -39,7 +41,7 @@ Octree::~Octree()
 
 void Octree::Insert(ColliderObject* collider)
 {
-    if (IsInside(collider->position) == false)
+    if (Contains(collider->position) == false)
     {
         return;
     }
@@ -54,16 +56,16 @@ void Octree::Insert(ColliderObject* collider)
         {
             Subdivide();
         }
-        for (int i = 0; i < CHILDREN_COUNT; ++i)
+        for (int i = 0; i < CHILDREN_COUNT; i++)
         {
             children[i]->Insert(collider);
         }
     }
 }
 
-void Octree::Retrieve(const ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
+void Octree::Retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
 {
-    if (IsInside(collider->position) == false)
+    if (Contains(collider->position) == false) 
     {
         return;
     }
@@ -75,14 +77,14 @@ void Octree::Retrieve(const ColliderObject* collider, std::list<ColliderObject*>
 
     if (children[0])
     {
-        for (int i = 0; i < CHILDREN_COUNT; ++i)
+        for (int i = 0; i < CHILDREN_COUNT; i++)
         {
             children[i]->Retrieve(collider, possibleColliders);
         }
     }
 }
 
-bool Octree::IsInside(const Vec3& point) const
+bool Octree::Contains(Vec3& point)
 {
     bool isInsideX = false;
     bool isInsideY = false;
@@ -108,7 +110,7 @@ void Octree::Subdivide()
 {
     Vec3 halfChildSize = halfSize * 0.5f;
 
-    for (int childIndex = 0; childIndex < CHILDREN_COUNT; ++childIndex)
+    for (int childIndex = 0; childIndex < CHILDREN_COUNT; childIndex++)
     {
         Vec3 childCenter = center;
 
@@ -125,8 +127,7 @@ void Octree::Subdivide()
         {
             childCenter.y += halfChildSize.y;
         }
-        else 
-        {
+        else {
             childCenter.y -= halfChildSize.y;
         }
 

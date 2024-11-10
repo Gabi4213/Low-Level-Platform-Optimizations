@@ -1,12 +1,8 @@
-﻿  DiagnosticsTracker.cpp
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(135,64): warning C4129: 'C': unrecognized character escape sequence
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(146,66): warning C4129: 'C': unrecognized character escape sequence
-  main.cpp
+﻿  main.cpp
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
   Generating code
-  2 of 1756 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
+  14 of 1756 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
+    6 functions were new in current compilation
     12 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Physio.vcxproj -> C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Release\Physio.exe
