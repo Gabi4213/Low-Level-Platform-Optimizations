@@ -2,7 +2,6 @@
 
 #include "ColliderObject.h"
 #include "MemoryPool.h"
-#include "globals.h"
 
 class Box : public ColliderObject
 {

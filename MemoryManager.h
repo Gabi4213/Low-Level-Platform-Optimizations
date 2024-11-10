@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include <mutex>
 
 extern const unsigned int CHECK_VALUE;
 extern size_t totalAllocatedMemory;

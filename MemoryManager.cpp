@@ -1,6 +1,4 @@
 #include "MemoryManager.h"
-#include <iostream>
-#include <mutex>
 
 const unsigned int CHECK_VALUE = 0xDEADBEEF;
 size_t totalAllocatedMemory = 0;
@@ -10,105 +8,97 @@ Header* lastAllocation{ nullptr };
 
 MemoryAllocation memoryAllocation;
 
-std::mutex mutex;
 
 void* operator new (size_t size)
 {
-	//std::cout << "new operator is being called" << std::endl;
+    size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
 
-	std::lock_guard<std::mutex> lock(mutex);
+    memoryAllocation.bytesAllocated += totalSize;
+    memoryAllocation.bytes += totalSize;
+    memoryAllocation.bytesSize = size;
 
-	size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
+    char* poolMemory = (char*)malloc(totalSize);
 
-	memoryAllocation.bytesAllocated += totalSize;
-	memoryAllocation.bytes += totalSize;
-	memoryAllocation.bytesSize = size;
+    if (poolMemory == nullptr)
+    {
+        throw std::bad_alloc();
+    }
 
-	char* poolMemory = (char*)malloc(totalSize);
+    Header* headerPtr = (Header*)poolMemory;
+    headerPtr->size = size;
+    headerPtr->checkValue = CHECK_VALUE;
+   // headerPtr->previousHeader = lastAllocation;
+    headerPtr->nextHeader = nullptr;
 
-	if (poolMemory == nullptr)
-	{
-		throw std::bad_alloc();
-	}
+    //if (lastAllocation != nullptr)
+    //{
+    //    lastAllocation->nextHeader = headerPtr;
+    //}
 
-	Header* headerPtr = (Header*)poolMemory;
-	headerPtr->size = size;
-	headerPtr->checkValue = CHECK_VALUE;
-	headerPtr->previousHeader = lastAllocation;
-	headerPtr->nextHeader = nullptr;
+   // lastAllocation = headerPtr;
 
-	if (lastAllocation != nullptr)
-	{
-		lastAllocation->nextHeader = headerPtr;
-	}
+    //if (firstAllocation == nullptr)
+    //{
+    //    firstAllocation = headerPtr;
+    //}
 
-	lastAllocation = headerPtr;
+    Footer* footerPtr = (Footer*)(poolMemory + sizeof(Header) + size);
+    footerPtr->checkValue = CHECK_VALUE;
 
-	if (firstAllocation == nullptr)
-	{
-		firstAllocation = headerPtr;
-	}
+    totalAllocatedMemory += size;
 
-	Footer* footerPtr = (Footer*)(poolMemory + sizeof(Header) + size);
-	footerPtr->checkValue = CHECK_VALUE;
+    void* pStartMemBlock = poolMemory + sizeof(Header);
 
-	totalAllocatedMemory += size;
-
-	void* pStartMemBlock = poolMemory + sizeof(Header);
-	return pStartMemBlock;
+    return pStartMemBlock;
 }
 
 void operator delete (void* poolMemory)
 {
-	if (poolMemory == nullptr)
-	{
-		std::cout << "poolMemory is nullptr. Nothing to delete" << std::endl;
-		return;
-	}
+    if (poolMemory == nullptr)
+    {
+        std::cout << "poolMemory is nullptr. Nothing to delete" << std::endl;
+        return;
+    }
 
-	std::lock_guard<std::mutex> lock(mutex);
+    Header* headerPtr = (Header*)((char*)poolMemory - sizeof(Header));
+    Footer* footerPtr = (Footer*)((char*)poolMemory + headerPtr->size);
 
-	//std::cout << "delete operator is being called" << std::endl;
+   /* if (headerPtr == firstAllocation)
+    {
+        firstAllocation = headerPtr->nextHeader;
+    }
+    else if (headerPtr->previousHeader != nullptr)
+    {
+        headerPtr->previousHeader->nextHeader = headerPtr->nextHeader;
+    }
 
-	Header* headerPtr = (Header*)((char*)poolMemory - sizeof(Header));
-	Footer* footerPtr = (Footer*)((char*)poolMemory + headerPtr->size);
+    if (headerPtr == lastAllocation)
+    {
+        lastAllocation = headerPtr->previousHeader;
+    }
+    else if (headerPtr->nextHeader != nullptr)
+    {
+        headerPtr->nextHeader->previousHeader = headerPtr->previousHeader;
+    }*/
 
-	if (headerPtr == firstAllocation)
-	{
-		firstAllocation = headerPtr->nextHeader;
-	}
-	else
-	{
-		headerPtr->previousHeader->nextHeader = headerPtr->nextHeader;
-	}
+    if (headerPtr->checkValue != CHECK_VALUE)
+    {
+        std::cout << "header check value doesn't match! Buffer Overflow!" << std::endl;
+        return;
+    }
 
-	if (headerPtr == lastAllocation)
-	{
-		lastAllocation = headerPtr->previousHeader;
-	}
-	else
-	{
-		headerPtr->nextHeader->previousHeader = headerPtr->previousHeader;
-	}
+    if (footerPtr->checkValue != CHECK_VALUE)
+    {
+        std::cout << "footer check value doesn't match! Buffer Overflow!" << std::endl;
+        return;
+    }
 
-	if (headerPtr->checkValue != CHECK_VALUE)
-	{
-		std::cout << "header check value doesnt match! Buffer Overflow!" << std::endl;
-		return;
-	}
+    totalAllocatedMemory -= headerPtr->size;
 
-	if (footerPtr->checkValue != CHECK_VALUE)
-	{
-		std::cout << "footer check value doesnt match! Buffer Overflow!" << std::endl;
-		return;
-	}
+    memoryAllocation.bytesSize = 0;
 
-	totalAllocatedMemory -= headerPtr->size;
+    memoryAllocation.bytesDeallocated += sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
+    memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
 
-	memoryAllocation.bytesSize = 0;
-
-	memoryAllocation.bytesDeallocated += sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
-	memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
-
-	free(headerPtr);
+    free(headerPtr);
 }

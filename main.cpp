@@ -52,6 +52,8 @@ size_t boxTotalBytesAllocated = 1024;
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
 
+std::mutex globalMutex;
+
 std::list<ColliderObject*> colliders;
 
 DiagnosticsTracker* diagnosticsTracker;
@@ -59,6 +61,8 @@ DiagnosticsTracker* diagnosticsTracker;
 Octree* octree;
 
 std::list<std::thread> threads;
+
+std::mutex collisionMutex;
 
 void DestroyColliders()
 {
@@ -191,7 +195,7 @@ Vec3 screenToWorld(int x, int y)
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
+void UpdateColliders(std::list<ColliderObject*> colliderList)
 {
     for (ColliderObject* collider : colliderList)
     {
@@ -204,7 +208,7 @@ void UpdateColliders(std::list<ColliderObject*> colliderList, std::mutex& mutex)
             {
                 if (collider->checkCollision(collider, other))
                 {
-                    std::lock_guard<std::mutex> lock(mutex);
+                    std::lock_guard<std::mutex> lock(collisionMutex);
                     collider->resolveCollision(collider, other);
                 }
             }
@@ -231,7 +235,7 @@ void updatePhysics(const float deltaTime)
 
     int colldidersPerThreads = colliders.size() / maxThreads;
     auto itterator = colliders.begin();
-    std::mutex mutex;
+    //std::mutex mutex;
 
     for (int i = 0; i < maxThreads; i++)
     {
@@ -246,7 +250,7 @@ void updatePhysics(const float deltaTime)
             }
         }
 
-        threads.push_back(std::thread(UpdateColliders, chunks, std::ref(mutex)));
+        threads.push_back(std::thread(UpdateColliders, chunks));
     }
 
     for (ColliderObject* collider : colliders)

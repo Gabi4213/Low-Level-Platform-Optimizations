@@ -1,7 +1,6 @@
 #pragma once
 #include "ColliderObject.h"
 #include "MemoryPool.h"
-#include "globals.h"
 
 class Sphere : public ColliderObject
 {
