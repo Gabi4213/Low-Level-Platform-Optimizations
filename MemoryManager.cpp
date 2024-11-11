@@ -7,10 +7,12 @@ Header* firstAllocation{ nullptr };
 Header* lastAllocation{ nullptr };
 
 MemoryAllocation memoryAllocation;
-
+std::mutex memoryMutex;
 
 void* operator new (size_t size)
 {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+
     size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
 
     memoryAllocation.bytesAllocated += totalSize;
@@ -27,20 +29,20 @@ void* operator new (size_t size)
     Header* headerPtr = (Header*)poolMemory;
     headerPtr->size = size;
     headerPtr->checkValue = CHECK_VALUE;
-   // headerPtr->previousHeader = lastAllocation;
+    headerPtr->previousHeader = lastAllocation;
     headerPtr->nextHeader = nullptr;
 
-    //if (lastAllocation != nullptr)
-    //{
-    //    lastAllocation->nextHeader = headerPtr;
-    //}
+    if (lastAllocation != nullptr)
+    {
+        lastAllocation->nextHeader = headerPtr;
+    }
 
-   // lastAllocation = headerPtr;
+    lastAllocation = headerPtr;
 
-    //if (firstAllocation == nullptr)
-    //{
-    //    firstAllocation = headerPtr;
-    //}
+    if (firstAllocation == nullptr)
+    {
+        firstAllocation = headerPtr;
+    }
 
     Footer* footerPtr = (Footer*)(poolMemory + sizeof(Header) + size);
     footerPtr->checkValue = CHECK_VALUE;
@@ -60,10 +62,12 @@ void operator delete (void* poolMemory)
         return;
     }
 
+    std::lock_guard<std::mutex> lock(memoryMutex);
+
     Header* headerPtr = (Header*)((char*)poolMemory - sizeof(Header));
     Footer* footerPtr = (Footer*)((char*)poolMemory + headerPtr->size);
 
-   /* if (headerPtr == firstAllocation)
+    if (headerPtr == firstAllocation)
     {
         firstAllocation = headerPtr->nextHeader;
     }
@@ -79,7 +83,7 @@ void operator delete (void* poolMemory)
     else if (headerPtr->nextHeader != nullptr)
     {
         headerPtr->nextHeader->previousHeader = headerPtr->previousHeader;
-    }*/
+    }
 
     if (headerPtr->checkValue != CHECK_VALUE)
     {
