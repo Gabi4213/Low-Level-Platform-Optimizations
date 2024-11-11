@@ -5,23 +5,20 @@
 extern const unsigned int CHECK_VALUE;
 extern size_t totalAllocatedMemory;
 
-void* operator new (size_t size);
-void operator delete (void* poolMemory);
+//Meyers Singleton since mutex issues
+std::mutex& getAllocationMutex();
+
+void* operator new(size_t size);
+void operator delete(void* poolMemory);
 
 struct MemoryAllocation
 {
     size_t bytesAllocated;
     size_t bytesDeallocated;
     size_t bytes;
-
     size_t bytesSize;
 
-    MemoryAllocation()
-    {
-        this->bytesAllocated = 0;
-        this->bytesDeallocated = 0;
-        this->bytes = 0;
-    }
+    MemoryAllocation() : bytesAllocated(0), bytesDeallocated(0), bytes(0), bytesSize(0) {}
 };
 
 struct Header
@@ -41,4 +38,3 @@ extern Header* firstAllocation;
 extern Header* lastAllocation;
 
 extern MemoryAllocation memoryAllocation;
-extern std::mutex memoryMutex;
