@@ -142,10 +142,22 @@ void DiagnosticsTracker::WalkTheHeap()
         {
             std::cout << "\n\tCorrupt" << std::endl;
         }
-
         std::cout << "\nCurrent Footer at: " << currentFooter << "\n\Check Value: " << currentFooter->checkValue << "\n\tSize: " << currentHeader->size << "\n\n";
 
         currentHeader = currentHeader->nextHeader;
+    }
+}
+void DiagnosticsTracker::TriggerMemoryCorruption()
+{
+    if (firstAllocation != nullptr)
+    {
+        // invert the check vaslue. I do this since I cant actually set the check value to something as its a const
+        firstAllocation->checkValue = ~firstAllocation->checkValue; 
+        WalkTheHeap();
+    }
+    else
+    {
+        std::cout << "firstAllocation null nothing to corrupt." << std::endl;
     }
 }
 
@@ -174,6 +186,7 @@ void DiagnosticsTracker::TriggerBufferOverflow()
     }
 
     delete[] x;
+    x = nullptr;
 }
 
 void DiagnosticsTracker::AllocateMemory(int size)
@@ -185,5 +198,6 @@ void DiagnosticsTracker::AllocateMemory(int size)
 void DiagnosticsTracker::DeallocateMemory()
 {
     delete[] testArray;
+    testArray = nullptr;
     std::cout << "\nBytes Deallocated, Current Size: " << memoryAllocation.bytesSize << std::endl;
 }

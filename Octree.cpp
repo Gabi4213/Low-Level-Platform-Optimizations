@@ -35,6 +35,7 @@ Octree::~Octree()
         if (children[i])
         {
             delete children[i];
+            children[i] = nullptr;
         }
     }
 }

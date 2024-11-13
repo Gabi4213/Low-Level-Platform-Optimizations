@@ -18,7 +18,7 @@ void* MemoryPool::AllocateMemory(size_t size)
 {
     if (size > blocksSize)
     {
-        throw std::runtime_error("Requested size is larger than block size");
+        throw std::runtime_error("Requested size is larger than block size!");
     }
 
     if (freeList.empty() == false) 
@@ -30,7 +30,7 @@ void* MemoryPool::AllocateMemory(size_t size)
 
     if (poolOffset + blocksSize > poolSize) 
     {
-        throw std::runtime_error("Memory pool used up");
+        throw std::runtime_error("Memory pool used up!");
     }
 
     void* memory = static_cast<char*>(memoryPool) + poolOffset;
@@ -46,7 +46,7 @@ void MemoryPool::DeallocateMemory(void* poolMemory)
     }
     else 
     {
-        throw std::runtime_error("Pointer out of memory pool range");
+        throw std::runtime_error("Pointer out of memory pool range!");
     }
 }
 

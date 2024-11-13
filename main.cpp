@@ -265,6 +265,7 @@ void updatePhysics(const float deltaTime)
 
     threads.clear();
     delete octree;
+    octree = nullptr;
 
     diagnosticsTracker->StopTimer(functionName);
 }
@@ -396,6 +397,10 @@ void DrawImGui()
         if (ImGui::Button("Trigger Buffer Overflow"))
         {
             diagnosticsTracker->TriggerBufferOverflow();
+        }
+        if (ImGui::Button("Trigger Corruption"))
+        {
+            diagnosticsTracker->TriggerMemoryCorruption();
         }
 
         ImGui::Text("Demonstration of ‘global new and delete’");

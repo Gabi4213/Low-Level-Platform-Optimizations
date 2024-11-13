@@ -15,7 +15,6 @@ void* Sphere::operator new(size_t size)
     if (sphereMemoryPool == nullptr)
     {
         std::cout << "memory pool not initalized. Call InitalizeMemoryPool()" << std::endl;
-        //sphereMemoryPool = new MemoryPool(1024 * sphereBytesTotal, size); 
     }
     return sphereMemoryPool->AllocateMemory(size);
 }
@@ -26,6 +25,10 @@ void Sphere::operator delete(void* poolMemory, size_t size)
     if (sphereMemoryPool != nullptr)
     {
         sphereMemoryPool->DeallocateMemory(poolMemory);
+    }
+    else 
+    {
+        std::cout << "memory already deallocated!" << std::endl;
     }
 }
 

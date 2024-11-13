@@ -56,6 +56,7 @@ public:
 	void OutputSphereMemoryAllocation();
 
 	void TriggerBufferOverflow();
+	void TriggerMemoryCorruption();
 
 	void AllocateMemory(int size);
 	void DeallocateMemory();

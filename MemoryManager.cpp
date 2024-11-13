@@ -18,7 +18,6 @@ MemoryAllocation memoryAllocation;
 
 void* operator new(size_t size)
 {
-    // Lock the mutex using getAllocationMutex()
     std::lock_guard<std::mutex> lock(getAllocationMutex());
 
     size_t totalSize = sizeof(Header) + sizeof(Footer) + size;
@@ -37,7 +36,6 @@ void* operator new(size_t size)
     headerPtr->checkValue = CHECK_VALUE;
     headerPtr->nextHeader = nullptr;
 
-    // Update header chain
     if (lastAllocation != nullptr)
     {
         lastAllocation->nextHeader = headerPtr;
@@ -91,13 +89,13 @@ void operator delete(void* poolMemory)
 
     if (headerPtr->checkValue != CHECK_VALUE)
     {
-        std::cout << "header check value doesn't match! Buffer Overflow!" << std::endl;
+        std::cout << "header check value doesn't match. Buffer Overflow!" << std::endl;
         return;
     }
 
     if (footerPtr->checkValue != CHECK_VALUE)
     {
-        std::cout << "footer check value doesn't match! Buffer Overflow!" << std::endl;
+        std::cout << "footer check value doesn't match. Buffer Overflow!" << std::endl;
         return;
     }
 
@@ -107,4 +105,5 @@ void operator delete(void* poolMemory)
     memoryAllocation.bytes -= sizeof(*headerPtr) + headerPtr->size + sizeof(*footerPtr);
 
     free(headerPtr);
+    headerPtr = nullptr;
 }
