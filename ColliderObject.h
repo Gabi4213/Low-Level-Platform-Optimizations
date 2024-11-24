@@ -16,7 +16,11 @@ public:
     // if two colliders collide, push them away from each other
     void resolveCollision(ColliderObject* a, ColliderObject* b) 
     {
-        Vec3 normal = { a->position.x - b->position.x, a->position.y - b->position.y, a->position.z - b->position.z };
+        Vec3 normal = 
+        { 
+            a->position.x - b->position.x, a->position.y - b->position.y, a->position.z - b->position.z 
+        };
+
         float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
 
         // Normalize the normal vector
@@ -102,6 +106,11 @@ public:
         {
             velocity.z = -velocity.z;
         }
+    }
+
+    void impulse(float amount)
+    {
+       velocity.y += amount;
     }
 };
 

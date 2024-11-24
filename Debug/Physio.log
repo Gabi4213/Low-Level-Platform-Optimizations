@@ -1,13 +1,4 @@
-﻿  DiagnosticsTracker.cpp
+﻿  main.cpp
 C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(135,64): warning C4129: 'C': unrecognized character escape sequence
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\DiagnosticsTracker.cpp(146,66): warning C4129: 'C': unrecognized character escape sequence
-  MemoryPool.cpp
-  Octree.cpp
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Octree.cpp(50,46): warning C4018: '<': signed/unsigned mismatch
-  main.cpp
-C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Vec3.h(54,25): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
   Physio.vcxproj -> C:\Users\offic\Desktop\University\LOW-LEVEL PLATFORM OPTIMISATION\Git\LLPO\Debug\Physio.exe
   0 File(s) copied

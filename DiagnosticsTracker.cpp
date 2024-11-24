@@ -3,11 +3,11 @@
 
 DiagnosticsTracker::DiagnosticsTracker()
 {
-    InitCPUStats();
+    initCPUStats();
     lastUpdate = std::chrono::high_resolution_clock::now();
 }
 
-std::string DiagnosticsTracker::GetMemoryUsage()
+std::string DiagnosticsTracker::getMemoryUsage()
 {
     PROCESS_MEMORY_COUNTERS_EX processMemoryCounters;
     GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&processMemoryCounters, sizeof(processMemoryCounters));
@@ -15,7 +15,7 @@ std::string DiagnosticsTracker::GetMemoryUsage()
     return std::to_string(memoryUsage);
 }
 
-void DiagnosticsTracker::InitCPUStats()
+void DiagnosticsTracker::initCPUStats()
 {
     SYSTEM_INFO sysInfo;
     FILETIME ftime, fsys, fuser;
@@ -32,7 +32,7 @@ void DiagnosticsTracker::InitCPUStats()
     memcpy(&lastUserCPU, &fuser, sizeof(FILETIME));
 }
 
-std::string DiagnosticsTracker::GetCPUUsage()
+std::string DiagnosticsTracker::getCPUUsage()
 {
     FILETIME ftime, fsys, fuser;
     ULONGLONG now, sys, user;
@@ -67,7 +67,7 @@ std::string DiagnosticsTracker::GetCPUUsage()
     return std::to_string(cpuUsage);
 }
 
-std::string DiagnosticsTracker::GetFrameTime()
+std::string DiagnosticsTracker::getFrameTime()
 {
     float frameTime;
 
@@ -83,7 +83,7 @@ std::string DiagnosticsTracker::GetFrameTime()
     return std::to_string(frameTime);
 }
 
-std::string DiagnosticsTracker::GetFPS()
+std::string DiagnosticsTracker::getFPS()
 {
     frameCount++;
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -99,18 +99,18 @@ std::string DiagnosticsTracker::GetFPS()
     return std::to_string(fps);
 }
 
-std::string DiagnosticsTracker::GetTotalMemoryAllocated()
+std::string DiagnosticsTracker::getTotalMemoryAllocated()
 {
     return std::to_string(totalAllocatedMemory);
 }
 
 
-void DiagnosticsTracker::StartTimer(std::string& functionName)
+void DiagnosticsTracker::startTimer(std::string& functionName)
 {
     startTimes[functionName] = high_resolution_clock::now();
 }
 
-void DiagnosticsTracker::StopTimer(std::string& functionName)
+void DiagnosticsTracker::stopTimer(std::string& functionName)
 {
     auto stopTime = high_resolution_clock::now();
 
@@ -119,12 +119,12 @@ void DiagnosticsTracker::StopTimer(std::string& functionName)
     functionDurations[functionName] = duration;
 }
 
-std::string DiagnosticsTracker::GetFunctionRunTime(std::string& functionName)
+std::string DiagnosticsTracker::getFunctionRunTime(std::string& functionName)
 {
     return std::to_string(functionDurations[functionName].count());
 }
 
-void DiagnosticsTracker::WalkTheHeap()
+void DiagnosticsTracker::walkTheHeap()
 {
     Header* currentHeader = firstAllocation;
 
@@ -147,13 +147,13 @@ void DiagnosticsTracker::WalkTheHeap()
         currentHeader = currentHeader->nextHeader;
     }
 }
-void DiagnosticsTracker::TriggerMemoryCorruption()
+void DiagnosticsTracker::triggerMemoryCorruption()
 {
     if (firstAllocation != nullptr)
     {
         // invert the check vaslue. I do this since I cant actually set the check value to something as its a const
         firstAllocation->checkValue = ~firstAllocation->checkValue; 
-        WalkTheHeap();
+        walkTheHeap();
     }
     else
     {
@@ -161,22 +161,22 @@ void DiagnosticsTracker::TriggerMemoryCorruption()
     }
 }
 
-void DiagnosticsTracker::OutputMemoryAllocation()
+void DiagnosticsTracker::outputMemoryAllocation()
 {
-    std::cout << "\nBytes Allocated: " << memoryAllocation.bytesAllocated << "\nBytes Deallocated: " << memoryAllocation.bytesDeallocated << "\nBytes: " << memoryAllocation.bytes << "\n\n";
+    std::cout << "\nTotal Bytes Allocated: " << memoryAllocation.bytesAllocated << "\nTotal Bytes Deallocated: " << memoryAllocation.bytesDeallocated << "\nTotal Current Bytes: " << memoryAllocation.bytes << "\n\n";
 }
 
-void DiagnosticsTracker::OutputBoxMemoryAllocation()
+void DiagnosticsTracker::outputBoxMemoryAllocation()
 {    
-    std::cout << "Current Boxes Memory Allocated: " << Box::GetMemoryPool()->GetCurrentMemoryAllocated() << " Bytes\n";
+    std::cout << "Current Boxes Memory Allocated: " << Box::getMemoryPool()->getCurrentMemoryAllocated() << " Bytes\n";
 }
 
-void DiagnosticsTracker::OutputSphereMemoryAllocation()
+void DiagnosticsTracker::outputSphereMemoryAllocation()
 {
-    std::cout << "Current Spheres Memory Allocated: " << Sphere::GetMemoryPool()->GetCurrentMemoryAllocated() << " Bytes\n";
+    std::cout << "Current Spheres Memory Allocated: " << Sphere::getMemoryPool()->getCurrentMemoryAllocated() << " Bytes\n";
 }
 
-void DiagnosticsTracker::TriggerBufferOverflow()
+void DiagnosticsTracker::triggerBufferOverflow()
 {
     int* x = new int[10];
 
@@ -189,13 +189,13 @@ void DiagnosticsTracker::TriggerBufferOverflow()
     x = nullptr;
 }
 
-void DiagnosticsTracker::AllocateMemory(int size)
+void DiagnosticsTracker::allocateMemory(int size)
 {
     testArray = new int[size];
     std::cout << "\nBytes Allocated 4 * " << size << "= " << memoryAllocation.bytesSize << std::endl;
 }
 
-void DiagnosticsTracker::DeallocateMemory()
+void DiagnosticsTracker::deallocateMemory()
 {
     delete[] testArray;
     testArray = nullptr;

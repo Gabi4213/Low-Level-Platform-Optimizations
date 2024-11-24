@@ -19,16 +19,14 @@ public:
     Octree(Vec3& octreeCenter, Vec3& octreeHalfSize, int depth = 0);
     ~Octree();
 
-    void Insert(ColliderObject* collider);
-    void Retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders);
-
-    void SetOctreeVariables(int depth, int maxObjects);
+    void insert(ColliderObject* collider);
+    void retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders);
+    void setOctreeVariables(int depth, int maxObjects);
 
 private:
-
     int octreeDepth;
     int octreeMaxObjects;
 
-    bool Contains(Vec3& point);
-    void Subdivide();
+    bool contains(Vec3& point);
+    void subdivide();
 };

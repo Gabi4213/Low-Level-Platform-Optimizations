@@ -28,8 +28,6 @@
 
 using namespace std::chrono;
 
-// this is the number of falling physical items. 
-
 int numberOfBoxes = 50;
 int numberOfSpheres = 50;
 
@@ -41,8 +39,6 @@ int memoryAllocatedSize = 10;
 int maxThreads = 4;
 
 size_t boxTotalBytesAllocated = 1024;
-
-// these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
 #define LOOKAT_X 10
 #define LOOKAT_Y 10
@@ -64,7 +60,8 @@ std::list<std::thread> threads;
 
 std::mutex collisionMutex;
 
-void DestroyColliders()
+//used to destroy all colliders in the scene
+void destroyColliders()
 {
     for (ColliderObject* obj : colliders)
     {
@@ -81,14 +78,16 @@ void DestroyColliders()
     colliders.clear();
 }
 
-void AllocateColliderBytes(size_t boxBytes, size_t sphereBytes)
+//allocate how bytes for spheres and boxes individually
+void allocateColliderBytes(size_t boxBytes, size_t sphereBytes)
 {
-    DestroyColliders();
+    destroyColliders();
 
-    Box::InitalizeMemoryPool(boxBytes);
-    Sphere::InitalizeMemoryPool(sphereBytes);
+    Box::initalizeMemoryPool(boxBytes);
+    Sphere::initalizeMemoryPool(sphereBytes);
 }
 
+//initlaize the scene
 void initScene(int boxCount, int sphereCount)
 {
     diagnosticsTracker = new DiagnosticsTracker();
@@ -195,12 +194,12 @@ Vec3 screenToWorld(int x, int y)
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-void UpdateColliders(std::list<ColliderObject*> colliderList)
+void updateColliders(std::list<ColliderObject*> colliderList)
 {
     for (ColliderObject* collider : colliderList)
     {
         std::list<ColliderObject*> possibleColliders;
-        octree->Retrieve(collider, possibleColliders);
+        octree->retrieve(collider, possibleColliders);
 
         for (ColliderObject* other : possibleColliders)
         {
@@ -220,22 +219,21 @@ void UpdateColliders(std::list<ColliderObject*> colliderList)
 void updatePhysics(const float deltaTime)
 {
     std::string functionName = "updatePhysics";
-    diagnosticsTracker->StartTimer(functionName);
+    diagnosticsTracker->startTimer(functionName);
 
     Vec3 octreeCenter = Vec3(0.0f, 0.0f, 0.0f);
     Vec3 octreeHalfSize = Vec3(100.0f, 100.0f, 100.0f);
 
     octree = new Octree(octreeCenter, octreeHalfSize);
-    octree->SetOctreeVariables(octreeDepth, octreeMaxObjects);
+    octree->setOctreeVariables(octreeDepth, octreeMaxObjects);
 
     for (ColliderObject* collider : colliders)
     {
-        octree->Insert(collider);
+        octree->insert(collider);
     }
 
     int colldidersPerThreads = colliders.size() / maxThreads;
     auto itterator = colliders.begin();
-    //std::mutex mutex;
 
     for (int i = 0; i < maxThreads; i++)
     {
@@ -250,7 +248,7 @@ void updatePhysics(const float deltaTime)
             }
         }
 
-        threads.push_back(std::thread(UpdateColliders, chunks));
+        threads.push_back(std::thread(updateColliders, chunks));
     }
 
     for (ColliderObject* collider : colliders)
@@ -267,7 +265,7 @@ void updatePhysics(const float deltaTime)
     delete octree;
     octree = nullptr;
 
-    diagnosticsTracker->StopTimer(functionName);
+    diagnosticsTracker->stopTimer(functionName);
 }
 
 // draw the sides of the containing area
@@ -286,7 +284,7 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4)
 void drawScene() 
 {
     std::string functionName = "drawScene";
-    diagnosticsTracker->StartTimer(functionName);
+    diagnosticsTracker->startTimer(functionName);
 
     // Draw the side wall
     GLfloat diffuseMaterial[] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -322,28 +320,30 @@ void drawScene()
         box->draw();
     }
 
-    diagnosticsTracker->StopTimer(functionName);
+    diagnosticsTracker->stopTimer(functionName);
 }
 
-void DrawImGui()
+//draw im gui UI
+void drawImGui()
 {
+#ifdef _DEBUG
     ImGui::Begin("Statistics & Controls");
 
     if (ImGui::CollapsingHeader("Diagnostic Data"))
     {
         //Memory
-        ImGui::Text("RAM Memory Usage: %s", diagnosticsTracker->GetMemoryUsage().c_str());
+        ImGui::Text("RAM Memory Usage: %s", diagnosticsTracker->getMemoryUsage().c_str());
 
         //CPU
-        std::string cpuUsage = diagnosticsTracker->GetCPUUsage() + "%";
+        std::string cpuUsage = diagnosticsTracker->getCPUUsage() + "%";
         ImGui::Text("CPU Usage: %s", cpuUsage.c_str());
 
         //Frame Time
-        std::string frameTime = "Frame Time: " + diagnosticsTracker->GetFrameTime();
+        std::string frameTime = "Frame Time: " + diagnosticsTracker->getFrameTime();
         ImGui::Text(frameTime.c_str());
 
         //FPS
-        std::string fps = "FPS: " + diagnosticsTracker->GetFPS() + "ms";
+        std::string fps = "FPS: " + diagnosticsTracker->getFPS() + "ms";
         ImGui::Text(fps.c_str());
 
         //Thread Count
@@ -351,68 +351,68 @@ void DrawImGui()
         ImGui::Text(threadCount.c_str());
 
         //Total Memory Allocation
-        std::string totalMemoryAllocation = "Total Memory Allocation: " + diagnosticsTracker->GetTotalMemoryAllocated();
+        std::string totalMemoryAllocation = "Total Memory Allocation: " + diagnosticsTracker->getTotalMemoryAllocated();
         ImGui::Text(totalMemoryAllocation.c_str());
 
         //function run times
 
-        //physics
+        //physics function
         std::string updatePhysicsfunctionName = "updatePhysics";
-        std::string updatePhysicsRunTime = "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(updatePhysicsfunctionName);
+        std::string updatePhysicsRunTime = "updatePhysics() Execution Time: " + diagnosticsTracker->getFunctionRunTime(updatePhysicsfunctionName);
         ImGui::Text(updatePhysicsRunTime.c_str());
 
-        //draw
+        //draw function
         std::string drawScenefunctionName = "drawScene";
-        std::string drawSceneRunTime = "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(drawScenefunctionName);
+        std::string drawSceneRunTime = "drawScene() Execution Time: " + diagnosticsTracker->getFunctionRunTime(drawScenefunctionName);
         ImGui::Text(drawSceneRunTime.c_str());
 
         if (ImGui::Button("Print Function Execution Times"))
         {
-            std::cout << "drawScene() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(drawScenefunctionName) << std::endl;
-            std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->GetFunctionRunTime(updatePhysicsfunctionName) << std::endl;
+            std::cout << "drawScene() Execution Time: " + diagnosticsTracker->getFunctionRunTime(drawScenefunctionName) << std::endl;
+            std::cout << "updatePhysics() Execution Time: " + diagnosticsTracker->getFunctionRunTime(updatePhysicsfunctionName) << std::endl;
         }
     }
     if (ImGui::CollapsingHeader("Memory Management"))
     {
         if (ImGui::Button("Walk The Heap"))
         {
-            diagnosticsTracker->WalkTheHeap();
+            diagnosticsTracker->walkTheHeap();
         }
 
         if (ImGui::Button("Output Memory Allocation"))
         {
-            diagnosticsTracker->OutputMemoryAllocation();
+            diagnosticsTracker->outputMemoryAllocation();
         }
 
         if (ImGui::Button("Output Box Memory Data"))
         {
-            diagnosticsTracker->OutputBoxMemoryAllocation();
+            diagnosticsTracker->outputBoxMemoryAllocation();
         }
 
         if (ImGui::Button("Output Sphere Memory Data"))
         {
-            diagnosticsTracker->OutputSphereMemoryAllocation();
+            diagnosticsTracker->outputSphereMemoryAllocation();
         }
 
         if (ImGui::Button("Trigger Buffer Overflow"))
         {
-            diagnosticsTracker->TriggerBufferOverflow();
+            diagnosticsTracker->triggerBufferOverflow();
         }
         if (ImGui::Button("Trigger Corruption"))
         {
-            diagnosticsTracker->TriggerMemoryCorruption();
+            diagnosticsTracker->triggerMemoryCorruption();
         }
 
         ImGui::Text("Demonstration of ‘global new and delete’");
-        ImGui::SliderInt("Memory to Allocate", &memoryAllocatedSize, 0, 50);
+        ImGui::SliderInt("Memory Amount", &memoryAllocatedSize, 0, 50);
 
         if (ImGui::Button("Allocate Memory"))
         {
-            diagnosticsTracker->AllocateMemory(memoryAllocatedSize);
+            diagnosticsTracker->allocateMemory(memoryAllocatedSize);
         }
         if (ImGui::Button("Deallocate Memory"))
         {
-            diagnosticsTracker->DeallocateMemory();
+            diagnosticsTracker->deallocateMemory();
         }
     }
     if (ImGui::CollapsingHeader("Objects"))
@@ -422,7 +422,7 @@ void DrawImGui()
 
         if (ImGui::Button("Initialize Scene"))
         {
-            AllocateColliderBytes(1024, 1024);
+            allocateColliderBytes(1024, 1024);
 
             initScene(numberOfBoxes, numberOfSpheres);
         }
@@ -432,7 +432,7 @@ void DrawImGui()
             numberOfBoxes = 50;
             numberOfSpheres = 50;
 
-            AllocateColliderBytes(1024, 1024);
+            allocateColliderBytes(1024, 1024);
 
             initScene(numberOfBoxes, numberOfSpheres);
         }
@@ -443,7 +443,7 @@ void DrawImGui()
             numberOfBoxes = 500;
             numberOfSpheres = 500;
 
-            AllocateColliderBytes(1024, 1024);
+            allocateColliderBytes(1024, 1024);
 
             initScene(numberOfBoxes, numberOfSpheres);
         }
@@ -454,9 +454,16 @@ void DrawImGui()
             numberOfBoxes = 2500;
             numberOfSpheres = 2500;
 
-            AllocateColliderBytes(5000, 5000);
+            allocateColliderBytes(5000, 5000);
 
             initScene(numberOfBoxes, numberOfSpheres);
+        }
+        if (ImGui::Button("Add Impulse")) 
+        {
+            for (ColliderObject* collider : colliders)
+            {
+                collider->impulse(20.0f);
+            }
         }
         if (ImGui::Button("Delete Object 1 by 1"))
         {
@@ -476,7 +483,7 @@ void DrawImGui()
         }
         if (ImGui::Button("Delete All Objects"))
         {
-            DestroyColliders();
+            destroyColliders();
         }
         if (ImGui::Button("Add Box"))
         {
@@ -532,37 +539,53 @@ void DrawImGui()
     }
     if (ImGui::CollapsingHeader("Octree"))
     {
+        std::string depthText = "Octree Depth: " + std::to_string(octreeDepth);
+        ImGui::Text(depthText.c_str());
+
+        std::string maxObjectsText = "Octree Max Objects: " + std::to_string(octreeMaxObjects);
+        ImGui::Text(maxObjectsText.c_str());
+
         ImGui::SliderInt("Depth", &octreeDepth, 1, 30);
         ImGui::SliderInt("Max Objects", &octreeMaxObjects, 1, 30);
     }
 
     ImGui::End();
+#endif
 }
 
 // called by GLUT - displays the scene
 void display()
 {
+#ifdef _DEBUG
     //imgui new frame
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplFreeGLUT_NewFrame();
 
-    DrawImGui();
+    drawImGui();
 
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
 
+
     glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
+#endif
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+
+#ifdef _DEBUG
     gluPerspective(40.0, io.DisplaySize.x / io.DisplaySize.y, 1.0, 150.0);
     glLoadIdentity();
+#endif
 
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
 
     drawScene();
 
+#ifdef _DEBUG
     glDisable(GL_LIGHTING);
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+#endif
     glEnable(GL_LIGHTING);
 
     glutSwapBuffers();
@@ -634,18 +657,125 @@ void mouse(int button, int state, int x, int y)
 // called when the keyboard is used
 void keyboard(unsigned char key, int x, int y) 
 {
-    const float impulseMagnitude = 20.0f; // Upward impulse magnitude
+    //output memory data in general, sphere memeory ,box memory
+    if (key == 'm') 
+    {
+        diagnosticsTracker->outputMemoryAllocation();
+        diagnosticsTracker->outputBoxMemoryAllocation();
+        diagnosticsTracker->outputSphereMemoryAllocation();
+    }
 
-    if (key == ' ')
-    { 
-        for (ColliderObject* box : colliders) 
+    //allocate 10 bytes
+    else if (key == 't')
+    {
+        diagnosticsTracker->allocateMemory(10);
+    }
+    //deallocate memory
+    else if (key == 'u')
+    {
+        diagnosticsTracker->deallocateMemory();
+    }
+
+    //add boxes 1 by 1
+    else if (key == 'r')
+    {
+        Box* box = new Box();
+
+        // Assign random x, y, and z positions within specified ranges
+        box->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+        box->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+        box->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+        box->size = { 1.0f, 1.0f, 1.0f };
+
+        // Assign random x-velocity between -1.0f and 1.0f
+        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
+        box->velocity = { randomXVelocity, 0.0f, 0.0f };
+
+        // Assign a random color to the box
+        box->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        box->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        box->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+        colliders.push_back(box);
+    }
+    //remove boxes 1 by 1
+    else if (key == 'a')
+    {
+        auto itterator = colliders.begin();
+        while (itterator != colliders.end())
         {
-            box->velocity.y += impulseMagnitude;
+            if (Box* box = dynamic_cast<Box*>(*itterator))
+            {
+                Box::operator delete(*itterator, sizeof(Box));
+                colliders.erase(itterator);
+                break; 
+            }
+            else
+            {
+                itterator++;
+            }
         }
     }
-    else if (key == '1')
-    { 
-        std::cout << "Memory used" << std::endl;
+
+    //add spheres 1 by 1
+    else if (key == 'R')
+    {
+        Sphere* sphere = new Sphere;
+
+        // Assign random x, y, and z positions within specified ranges
+        sphere->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+        sphere->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+        sphere->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+        sphere->size = { 1.0f, 1.0f, 1.0f };
+
+        // Assign random x-velocity between -1.0f and 1.0f
+        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
+        sphere->velocity = { randomXVelocity, 0.0f, 0.0f };
+
+        // Assign a random color to the box
+        sphere->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        sphere->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        sphere->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+        colliders.push_back(sphere);
+    }
+    //remove spheres 1 by 1
+    else if (key == 'A')
+    {
+        auto itterator = colliders.begin();
+        while (itterator != colliders.end())
+        {
+            if (Sphere* box = dynamic_cast<Sphere*>(*itterator))
+            {
+                Sphere::operator delete(*itterator, sizeof(Sphere));
+                colliders.erase(itterator);
+                break;
+            }
+            else
+            {
+                itterator++;
+            }
+        }
+    }
+
+    //walk the heap
+    else if (key == 'w')
+    {
+        diagnosticsTracker->walkTheHeap();
+    }
+
+    //enforce memory corruption
+    else if (key == 'f')
+    {
+        diagnosticsTracker->triggerMemoryCorruption();
+    }
+
+    //buffer overflow
+    else if (key == 'h')
+    {
+        diagnosticsTracker->triggerBufferOverflow();
     }
 }
 
@@ -662,11 +792,13 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
 
+#ifdef _DEBUG
     // Setup ImGui binding
     ImGui::CreateContext();
     ImGui_ImplFreeGLUT_Init();
     ImGui_ImplFreeGLUT_InstallFuncs();
     ImGui_ImplOpenGL2_Init();
+#endif
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -676,10 +808,12 @@ int main(int argc, char** argv)
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
+#ifdef _DEBUG
     // Setup style
     ImGui::StyleColorsDark();
+#endif
 
-    AllocateColliderBytes(1024,1024);
+    allocateColliderBytes(1024,1024);
 
     initScene(numberOfBoxes, numberOfSpheres);
 
@@ -688,10 +822,13 @@ int main(int argc, char** argv)
     // it will stick here until the program ends. 
     glutMainLoop();
 
+#ifdef _DEBUG
     // Cleanup
     ImGui_ImplOpenGL2_Shutdown();
     ImGui_ImplFreeGLUT_Shutdown();
     ImGui::DestroyContext();
+
+#endif
 
     //Diagnositcs Tracker Cleanup
     delete diagnosticsTracker;

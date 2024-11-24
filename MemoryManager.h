@@ -5,7 +5,6 @@
 extern const unsigned int CHECK_VALUE;
 extern size_t totalAllocatedMemory;
 
-//Meyers Singleton since mutex issues
 std::mutex& getAllocationMutex();
 
 void* operator new(size_t size);

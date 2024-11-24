@@ -14,7 +14,7 @@ MemoryPool::~MemoryPool()
     operator delete(memoryPool);
 }
 
-void* MemoryPool::AllocateMemory(size_t size)
+void* MemoryPool::allocateMemory(size_t size)
 {
     if (size > blocksSize)
     {
@@ -38,7 +38,7 @@ void* MemoryPool::AllocateMemory(size_t size)
     return memory;
 }
 
-void MemoryPool::DeallocateMemory(void* poolMemory)
+void MemoryPool::deallocateMemory(void* poolMemory)
 {
     if (poolMemory >= memoryPool && poolMemory < static_cast<char*>(memoryPool) + poolSize)
     {
@@ -50,7 +50,7 @@ void MemoryPool::DeallocateMemory(void* poolMemory)
     }
 }
 
-size_t MemoryPool::GetCurrentMemoryAllocated()
+size_t MemoryPool::getCurrentMemoryAllocated()
 {
     return poolOffset - (freeList.size() * blocksSize);
 }

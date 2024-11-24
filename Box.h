@@ -5,17 +5,16 @@
 
 class Box : public ColliderObject
 {
-private:
-	static MemoryPool* boxMemoryPool;
 public:
-
-	static void InitalizeMemoryPool(size_t totalBytesAllocated);
+	static void initalizeMemoryPool(size_t totalBytesAllocated);
 
     static void* operator new(size_t size);
     static void operator delete(void* poolMemory, size_t size);
 
-	static MemoryPool* GetMemoryPool();
+	static MemoryPool* getMemoryPool();
 
 	void drawMesh() { glutSolidCube(1.0); }
+private:
+	static MemoryPool* boxMemoryPool;
 };
 

@@ -19,6 +19,30 @@ using namespace std::chrono;
 
 class DiagnosticsTracker
 {
+public:
+	DiagnosticsTracker();
+
+	void startTimer(std::string& functionName);
+	void stopTimer(std::string& functionName);
+
+	void walkTheHeap();
+
+	void outputMemoryAllocation();
+	void outputBoxMemoryAllocation();
+	void outputSphereMemoryAllocation();
+
+	void triggerBufferOverflow();
+	void triggerMemoryCorruption();
+
+	void allocateMemory(int size);
+	void deallocateMemory();
+
+	std::string getMemoryUsage();
+	std::string getCPUUsage();
+	std::string getFrameTime();
+	std::string getFPS();
+	std::string getFunctionRunTime(std::string& functionName);
+	std::string getTotalMemoryAllocated();
 private:
 	//Frame Time and FPS
 	std::chrono::high_resolution_clock::time_point lastTime = std::chrono::high_resolution_clock::now();
@@ -40,32 +64,6 @@ private:
 
 	int* testArray;
 
-	void InitCPUStats();
-
-public:
-
-	DiagnosticsTracker();
-
-	void StartTimer(std::string& functionName);
-	void StopTimer(std::string& functionName);
-
-	void WalkTheHeap();
-
-	void OutputMemoryAllocation();
-	void OutputBoxMemoryAllocation();
-	void OutputSphereMemoryAllocation();
-
-	void TriggerBufferOverflow();
-	void TriggerMemoryCorruption();
-
-	void AllocateMemory(int size);
-	void DeallocateMemory();
-
-	std::string GetMemoryUsage();
-	std::string GetCPUUsage();
-	std::string GetFrameTime();
-	std::string GetFPS();
-	std::string GetFunctionRunTime(std::string& functionName);
-	std::string GetTotalMemoryAllocated();
+	void initCPUStats();
 };
 

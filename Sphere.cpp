@@ -3,28 +3,28 @@
 
 MemoryPool* Sphere::sphereMemoryPool = nullptr;
 
-void Sphere::InitalizeMemoryPool(size_t totalBytesAllocated)
+void Sphere::initalizeMemoryPool(size_t totalBytesAllocated)
 {
     sphereMemoryPool = new MemoryPool(totalBytesAllocated * sizeof(Sphere), sizeof(Sphere));
 }
 
 void* Sphere::operator new(size_t size)
 {
-    std::cout << "sphere operator new called with size: " << size << std::endl;
+    std::cout << "sphere operator new called with size: " << size << " Bytes" << std::endl;
 
     if (sphereMemoryPool == nullptr)
     {
         std::cout << "memory pool not initalized. Call InitalizeMemoryPool()" << std::endl;
     }
-    return sphereMemoryPool->AllocateMemory(size);
+    return sphereMemoryPool->allocateMemory(size);
 }
 
 void Sphere::operator delete(void* poolMemory, size_t size)
 {
-    std::cout << "sphere operator delete called with size: " << size << std::endl;
+    std::cout << "sphere operator delete called with size: " << size << " Bytes" << std::endl;
     if (sphereMemoryPool != nullptr)
     {
-        sphereMemoryPool->DeallocateMemory(poolMemory);
+        sphereMemoryPool->deallocateMemory(poolMemory);
     }
     else 
     {
@@ -32,7 +32,7 @@ void Sphere::operator delete(void* poolMemory, size_t size)
     }
 }
 
-MemoryPool* Sphere::GetMemoryPool()
+MemoryPool* Sphere::getMemoryPool()
 {
     return sphereMemoryPool;
 }

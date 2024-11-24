@@ -8,13 +8,12 @@ private:
     static MemoryPool* sphereMemoryPool;
 
 public:
-
-    static void InitalizeMemoryPool(size_t totalBytesAllocated);
+    static void initalizeMemoryPool(size_t totalBytesAllocated);
 
     static void* operator new(size_t size);
     static void operator delete(void* poolMemory, size_t size);
 
-    static MemoryPool* GetMemoryPool();
+    static MemoryPool* getMemoryPool();
 
     void drawMesh() { glutSolidSphere(0.5, 5, 5); }
 }; 

@@ -3,7 +3,7 @@
 // It took me a really long time to get this octree class working. I ended up in the end creating multiple different versions of it.
 // The reasons I kept retrying is because at first I couldn't get it to work properly. Then once I got it working, I had issues of the 
 //class being overcomplicated and therefore causing lag when running the project. At some point I got it working with smaller numbers of
-//objects but now with larger numbers. So I ended up re-doing it and trying to keep it very simple. This version not only is simple, but
+//objects but not with larger numbers. So I ended up re-doing it and trying to keep it very simple. This version not only is simple, but
 //no longer includes functions like, remove, and doesnt seperate itself into 2 classes of OctreeNode and OctreeRoot. 
 
 // I found this great article about octrees that helped me make this class: 
@@ -40,9 +40,9 @@ Octree::~Octree()
     }
 }
 
-void Octree::Insert(ColliderObject* collider)
+void Octree::insert(ColliderObject* collider)
 {
-    if (Contains(collider->position) == false)
+    if (contains(collider->position) == false)
     {
         return;
     }
@@ -55,18 +55,18 @@ void Octree::Insert(ColliderObject* collider)
     {
         if (children[0] == nullptr)
         {
-            Subdivide();
+            subdivide();
         }
         for (int i = 0; i < CHILDREN_COUNT; i++)
         {
-            children[i]->Insert(collider);
+            children[i]->insert(collider);
         }
     }
 }
 
-void Octree::Retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
+void Octree::retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
 {
-    if (Contains(collider->position) == false) 
+    if (contains(collider->position) == false) 
     {
         return;
     }
@@ -80,12 +80,12 @@ void Octree::Retrieve(ColliderObject* collider, std::list<ColliderObject*>& poss
     {
         for (int i = 0; i < CHILDREN_COUNT; i++)
         {
-            children[i]->Retrieve(collider, possibleColliders);
+            children[i]->retrieve(collider, possibleColliders);
         }
     }
 }
 
-bool Octree::Contains(Vec3& point)
+bool Octree::contains(Vec3& point)
 {
     bool isInsideX = false;
     bool isInsideY = false;
@@ -107,7 +107,7 @@ bool Octree::Contains(Vec3& point)
     return isInsideX && isInsideY && isInsideZ;
 }
 
-void Octree::Subdivide()
+void Octree::subdivide()
 {
     Vec3 halfChildSize = halfSize * 0.5f;
 
@@ -145,7 +145,7 @@ void Octree::Subdivide()
     }
 }
 
-void Octree::SetOctreeVariables(int depth, int maxObjects)
+void Octree::setOctreeVariables(int depth, int maxObjects)
 {
     octreeDepth = depth;
     octreeMaxObjects = maxObjects;
