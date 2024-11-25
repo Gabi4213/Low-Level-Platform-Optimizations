@@ -177,10 +177,16 @@ void DiagnosticsTracker::triggerMemoryCorruption()
     {
         // invert the check vaslue. I do this since I cant actually set the check value to something as its a const
         //this way it still wont be the same and will cause corruption
+        //i do this to the first and last allocation so you can easily see it
         firstAllocation->checkValue = ~firstAllocation->checkValue; 
+        lastAllocation->checkValue = ~lastAllocation->checkValue;
 
         //walk the heap immidietly to display this
         walkTheHeap();
+
+        //fix the chck values now by inverting again
+        firstAllocation->checkValue = ~firstAllocation->checkValue;
+        lastAllocation->checkValue = ~lastAllocation->checkValue;
     }
     else
     {
