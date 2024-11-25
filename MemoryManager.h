@@ -17,7 +17,13 @@ struct MemoryAllocation
     size_t bytes;
     size_t bytesSize;
 
-    MemoryAllocation() : bytesAllocated(0), bytesDeallocated(0), bytes(0), bytesSize(0) {}
+    MemoryAllocation()
+    {
+        bytesAllocated = 0;
+        bytesDeallocated = 0;
+        bytes = 0;
+        bytesSize = 0;
+    }
 };
 
 struct Header

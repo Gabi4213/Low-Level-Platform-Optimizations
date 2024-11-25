@@ -16,12 +16,14 @@
 
 Octree::Octree(Vec3& octreeCenter, Vec3& octreeHalfSize, int depth)
 {
+    //initialize variables
     center = octreeCenter;
     halfSize = octreeHalfSize;
 
     octreeMaxObjects = 4;
     octreeDepth = 8;
 
+    //set children to null
     for (int i = 0; i < CHILDREN_COUNT; i++)
     {
         children[i] = nullptr;
@@ -30,6 +32,7 @@ Octree::Octree(Vec3& octreeCenter, Vec3& octreeHalfSize, int depth)
 
 Octree::~Octree()
 {
+    //clean up children 
     for (int i = 0; i < CHILDREN_COUNT; i++)
     {
         if (children[i])
@@ -42,17 +45,20 @@ Octree::~Octree()
 
 void Octree::insert(ColliderObject* collider)
 {
+    //if it doesnt contain collider position, then return out the function
     if (contains(collider->position) == false)
     {
         return;
     }
 
+    //check that depth is not 0 or that the size isn't exceeded. add collider to current node
     if (octreeDepth <= 0 || colliders.size() < octreeMaxObjects)
     {
         colliders.push_back(collider);
     }
     else
     {
+        //otherwise subdivide the node (into 8), redistribute colliders
         if (children[0] == nullptr)
         {
             subdivide();
@@ -66,16 +72,20 @@ void Octree::insert(ColliderObject* collider)
 
 void Octree::retrieve(ColliderObject* collider, std::list<ColliderObject*>& possibleColliders)
 {
+    //again if it doesnt contain collider position, then return out the function
     if (contains(collider->position) == false) 
     {
         return;
     }
 
-    for (auto* obj : colliders)
+    //push back all colliders to list
+    for (auto* col : colliders)
     {
-        possibleColliders.push_back(obj);
+        possibleColliders.push_back(col);
     }
 
+    //traverse the nodes and see if they contain the collider position
+    //if so then push them back to possibleColliders
     if (children[0])
     {
         for (int i = 0; i < CHILDREN_COUNT; i++)
@@ -87,66 +97,87 @@ void Octree::retrieve(ColliderObject* collider, std::list<ColliderObject*>& poss
 
 bool Octree::contains(Vec3& point)
 {
-    bool isInsideX = false;
-    bool isInsideY = false;
-    bool isInsideZ = false;
+    //set starting bools to false
+    bool x = false;
+    bool y = false;
+    bool z = false;
 
+    //check current octree node bound - x axis
     if (point.x >= center.x - halfSize.x && point.x <= center.x + halfSize.x)
     {
-        isInsideX = true;
+        x = true;
     }
+    //check current octree node bound - y axis
     if (point.y >= center.y - halfSize.y && point.y <= center.y + halfSize.y)
     {
-        isInsideY = true;
+        y = true;
     }
+    //check current octree node bound - z axis
     if (point.z >= center.z - halfSize.z && point.z <= center.z + halfSize.z)
     {
-        isInsideZ = true;
+        z = true;
     }
 
-    return isInsideX && isInsideY && isInsideZ;
+    //return the result of that
+    return x && y && z;
 }
 
 void Octree::subdivide()
 {
+    //store a reference to the half size of the child size. 
     Vec3 halfChildSize = halfSize * 0.5f;
 
-    for (int childIndex = 0; childIndex < CHILDREN_COUNT; childIndex++)
+    // loop through all children ( i is basically the child index)
+    for (int i = 0; i < CHILDREN_COUNT; i++)
     {
+        //current child center is set here to the parents center
         Vec3 childCenter = center;
 
-        if (childIndex & 1)
+        //here i am using bitwise operations. the lets me known which like area the child is in
+        // so like its done for each axis x,y and z
+        //https://www.programiz.com/cpp-programming/bitwise-operators
+        //https://beginnersbook.com/2022/09/bitwise-operators-in-c-with-examples/
+        if (i & 1)
         {
+            //move possitively - x
             childCenter.x += halfChildSize.x;
         }
         else
         {
+            //move negatively - x
             childCenter.x -= halfChildSize.x;
         }
 
-        if (childIndex & 2)
+        if (i & 2)
         {
+            //move possitively - y
             childCenter.y += halfChildSize.y;
         }
-        else {
+        else 
+        {
+            //move negatively - y
             childCenter.y -= halfChildSize.y;
         }
 
-        if (childIndex & 4)
+        if (i & 4)
         {
+            //move possitively - z
             childCenter.z += halfChildSize.z;
         }
         else
         {
+            //move negatively - z
             childCenter.z -= halfChildSize.z;
         }
 
-        children[childIndex] = new Octree(childCenter, halfChildSize, octreeDepth - 1);
+        //create new octree per child
+        children[i] = new Octree(childCenter, halfChildSize, octreeDepth - 1);
     }
 }
 
 void Octree::setOctreeVariables(int depth, int maxObjects)
 {
+    //returns depth and max objects
     octreeDepth = depth;
     octreeMaxObjects = maxObjects;
 }

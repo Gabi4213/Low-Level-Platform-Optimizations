@@ -28,18 +28,28 @@
 
 using namespace std::chrono;
 
+//bozxes and spheres
 int numberOfBoxes = 50;
 int numberOfSpheres = 50;
+std::list<ColliderObject*> colliders;
 
+//octree
 int octreeDepth = 5;
 int octreeMaxObjects = 4;
+Octree* octree;
 
+//memory
 int memoryAllocatedSize = 10;
+size_t boxTotalBytesAllocated = 1024; //defualt of 1024. works for most but once collider count is high this needs to be increased
+DiagnosticsTracker* diagnosticsTracker;
 
+//threads
 int maxThreads = 4;
+std::mutex globalMutex;
+std::mutex collisionMutex;
+std::list<std::thread> threads;
 
-size_t boxTotalBytesAllocated = 1024;
-
+//camera
 #define LOOKAT_X 10
 #define LOOKAT_Y 10
 #define LOOKAT_Z 50
@@ -48,21 +58,12 @@ size_t boxTotalBytesAllocated = 1024;
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
 
-std::mutex globalMutex;
-
-std::list<ColliderObject*> colliders;
-
-DiagnosticsTracker* diagnosticsTracker;
-
-Octree* octree;
-
-std::list<std::thread> threads;
-
-std::mutex collisionMutex;
-
 //used to destroy all colliders in the scene
 void destroyColliders()
 {
+    //something interesting I need to actually use a cast here otherwise for some reason sometimes VS would get confused
+    //And triued to delete a box using the sphere delete operator
+    //not sure why that was the case as sometimes i did work. So for saftey i cast it
     for (ColliderObject* obj : colliders)
     {
         if (Box* box = dynamic_cast<Box*>(obj))
@@ -79,6 +80,8 @@ void destroyColliders()
 }
 
 //allocate how bytes for spheres and boxes individually
+//i use this because like mentioned above 1024 works most the time
+//but when there is thousands of objects it needs to be increased
 void allocateColliderBytes(size_t boxBytes, size_t sphereBytes)
 {
     destroyColliders();
@@ -139,7 +142,7 @@ void initScene(int boxCount, int sphereCount)
     }
 }
 
-// a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
+// a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used
 bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const ColliderObject* box) 
 {
     float tMin = (box->position.x - box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
@@ -194,6 +197,8 @@ Vec3 screenToWorld(int x, int y)
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
+//this function checks for collisions and resolves them
+// it uses the octree and is in a differnt function now so that threads can call it
 void updateColliders(std::list<ColliderObject*> colliderList)
 {
     for (ColliderObject* collider : colliderList)
@@ -215,24 +220,31 @@ void updateColliders(std::list<ColliderObject*> colliderList)
     }
 }
 
-// update the physics: gravity, collision test, collision resolution
+// this function adds colliders to octree, updates their velocity etc, and uses threads#
+// it does NOT do any collision checking though
 void updatePhysics(const float deltaTime)
 {
+    //start timer
     std::string functionName = "updatePhysics";
     diagnosticsTracker->startTimer(functionName);
 
+    //create octree
     Vec3 octreeCenter = Vec3(0.0f, 0.0f, 0.0f);
     Vec3 octreeHalfSize = Vec3(100.0f, 100.0f, 100.0f);
 
     octree = new Octree(octreeCenter, octreeHalfSize);
     octree->setOctreeVariables(octreeDepth, octreeMaxObjects);
 
+    //insert colliders to octre
     for (ColliderObject* collider : colliders)
     {
         octree->insert(collider);
     }
 
+    //calculate how many colliders each thread deals with
     int colldidersPerThreads = colliders.size() / maxThreads;
+
+    //itterate through colliders and add them to new lists called chunks
     auto itterator = colliders.begin();
 
     for (int i = 0; i < maxThreads; i++)
@@ -247,24 +259,29 @@ void updatePhysics(const float deltaTime)
                 itterator++;
             }
         }
-
+        //since my threads are in a list push them back and have them call the update colliders function with the chunks list
         threads.push_back(std::thread(updateColliders, chunks));
     }
 
+    //updates colliders - this is just gravity, velocity and wall collisions
+    //no longer has actual collision checks though
     for (ColliderObject* collider : colliders)
     {
         collider->update(deltaTime);
     }
 
+    //join threads
     for (auto& thread : threads)
     {
         thread.join();
     }
 
+    //clean up
     threads.clear();
     delete octree;
     octree = nullptr;
 
+    //stop timer
     diagnosticsTracker->stopTimer(functionName);
 }
 
@@ -283,6 +300,7 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4)
 // draw the entire scene
 void drawScene() 
 {
+    //start timer
     std::string functionName = "drawScene";
     diagnosticsTracker->startTimer(functionName);
 
@@ -320,10 +338,12 @@ void drawScene()
         box->draw();
     }
 
+    //stop timer
     diagnosticsTracker->stopTimer(functionName);
 }
 
-//draw im gui UI
+//draw imgui UI
+//i addded #ifdef _DEBUG so its in debug only now
 void drawImGui()
 {
 #ifdef _DEBUG
@@ -420,6 +440,8 @@ void drawImGui()
         ImGui::SliderInt("Number of Cubes", &numberOfBoxes, 100, 1000);
         ImGui::SliderInt("Number of Spheres", &numberOfSpheres, 100, 1000);
 
+        //here I use allocateColliderBytes so that i can change the memory allocated to the colliders
+        // like mentioned above when there is a lot of boxes this needs to increase
         if (ImGui::Button("Initialize Scene"))
         {
             allocateColliderBytes(1024, 1024);
@@ -566,7 +588,6 @@ void display()
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
 
-
     glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
 #endif
 
@@ -579,7 +600,6 @@ void display()
 #endif
 
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
-
     drawScene();
 
 #ifdef _DEBUG
@@ -587,7 +607,6 @@ void display()
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 #endif
     glEnable(GL_LIGHTING);
-
     glutSwapBuffers();
 }
 
@@ -776,6 +795,14 @@ void keyboard(unsigned char key, int x, int y)
     else if (key == 'h')
     {
         diagnosticsTracker->triggerBufferOverflow();
+    }
+
+    else if (key == ' ') 
+    {
+        for (ColliderObject* collider : colliders) 
+        {
+            collider->impulse(20.0f);
+        }
     }
 }
 
