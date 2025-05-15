@@ -7,7 +7,7 @@ An optimized physics simulation developed in C++ with a focus on low-level syste
 🎥 [Watch the Demo on YouTube](https://www.youtube.com/watch?v=S0nVa922c0Q) *(right-click to open in new tab)*  
 *(Replace with actual link if you have one)*
 
-## ⚙️ Features
+## ✨ Features
 
 - **Custom Memory Pool**  
   Reduces heap fragmentation and speeds up memory allocation.
