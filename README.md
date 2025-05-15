@@ -31,7 +31,6 @@ An optimized physics simulation developed in C++ with a focus on low-level syste
 - **Memory Management:** Custom pool allocator  
 - **Platforms:** Windows, PlayStation 4 (via SDK)  
 - **Tools:** Visual Studio, PS4 development kit  
-- **Project Duration:** ~8 weeks
 
 ## 🧠 What I Learned
 
